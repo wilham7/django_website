@@ -25,7 +25,7 @@ SECRET_KEY = 'ihr$m(qjq^+$&p#&%cup%zquv4-hx)*^8+g2yjk$=p)cyr3bg&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [*]
+ALLOWED_HOSTS = ['*']
 
 TINYMCE_DEFAULT_CONFIG = {
     'height': 360,
