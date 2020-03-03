@@ -20,4 +20,6 @@ app_name = "drawingregister"
 
 urlpatterns = [
 	path("", views.homepage, name="homepage"),
+	path("testing/", views.testing, name="testing"),
+	path("upload/", views.upload, name="upload"),
 ]
