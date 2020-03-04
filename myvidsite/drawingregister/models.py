@@ -98,6 +98,8 @@ class Drawings(models.Model):
 	phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
 	originator = models.CharField(max_length=200,default="Cox Architects")
 
+	drawing_name = models.CharField(max_length=200,default="")
+
 	# This isn't really being used
 	def reqSubmissions(self):
 		rs = self.submissions.all()
@@ -124,6 +126,8 @@ class Drawings(models.Model):
 	def drawingNumber(self):
 		dn = self.dn_project + "-" + self.dn_originator + "-" + self.dn_volume_system + "-" + self.dn_type + "-" + self.revitSheetNumber()
 		dn = str(dn).replace("~","")
+		self.drawing_name = dn
+		self.save()
 		return dn
 
 	def drawingTitle(self):
