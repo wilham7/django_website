@@ -15,6 +15,13 @@ Including another URLconf
 """
 from django.urls import path
 from . import views
+from django.conf.urls import url, include
+from rest_framework import routers
+
+
+router = routers.DefaultRouter()
+router.register(r'drawings', views.DrawingViewSet)
+router.register(r'submissions', views.SubmissionViewSet)
 
 app_name = "drawingregister"
 
@@ -23,4 +30,7 @@ urlpatterns = [
 	path("testing/", views.testing, name="testing"),
     path("uploadDrawings/", views.uploadDrawings, name="uploadDrawings"),
 	path("uploadSubmissions/", views.uploadSubmissions, name="uploadSubmissions"),
+    path("drawingTable/", views.drawingTable, name="drawingTable"), 
+    url(r'^', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls')),
 ]

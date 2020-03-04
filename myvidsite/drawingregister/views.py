@@ -3,9 +3,27 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.core import serializers
 from .models import *
+from .serializers import *
 
 import json
 
+from rest_framework import viewsets
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+class DrawingViewSet(viewsets.ModelViewSet):
+	queryset = Drawings.objects.all()
+	serializer_class = DrawingSerializer
+	filter_backends = [filters.SearchFilter ,DjangoFilterBackend]
+	# filterset_fields = ['project__number',]
+	search_fields = ('drawing_name',)
+
+class SubmissionViewSet(viewsets.ModelViewSet):
+	queryset = Drawings.objects.all()
+	serializer_class = SubmissionSerializer
+	filter_backends = [filters.SearchFilter ,DjangoFilterBackend]
+	# filterset_fields = ['project__number',]
+	search_fields = ('sub_date',)
 
 # Create your views here.
 def homepage(request):
@@ -138,4 +156,12 @@ def uploadSubmissions(request):
 		return JsonResponse({'Created count':createdcount,'Updated count':updatecount,'log':str(log)})
 
 	else:
-		return JsonResponse({'Error':'ONLY POST REQUESTS'})		
+		return JsonResponse({'Error':'ONLY POST REQUESTS'})
+
+def drawingTable(request):
+	import json
+	allDrawings = DrawingSerializer(Drawings.objects.all(), many=True).data
+	context = {
+	"data":json.dumps(allDrawings)
+	}
+	return render(request,"drawingregister/tabletest.html",context)

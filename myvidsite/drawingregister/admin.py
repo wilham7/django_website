@@ -14,7 +14,7 @@ class drawingAdmin(admin.ModelAdmin):
         ("Additional info", {'fields': ["studio","model_location","revision_offset","scale","paper","dwg_type","discipline","phase","originator"]}),
         ("Generated", {'fields': ['revitSheetNumber', 'drawingNumber', 'drawingTitle', 'level', 'sequence']}),
         ("Submissions", {'fields': ['reqSubmissions', 'currentRev', 'nextRev',]}),
-        ("test", {'fields': ['drawing_name']}),
+        # ("test", {'fields': ['drawing_name']}),
     ]
 
     inlines = [
