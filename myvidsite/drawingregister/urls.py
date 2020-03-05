@@ -29,6 +29,7 @@ urlpatterns = [
 	path("", views.homepage, name="homepage"),
 	path("testing/", views.testing, name="testing"),
     path("uploadDrawings/", views.uploadDrawings, name="uploadDrawings"),
+    path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 	path("uploadSubmissions/", views.uploadSubmissions, name="uploadSubmissions"),
     path("drawingTable/", views.drawingTable, name="drawingTable"), 
     url(r'^', include(router.urls)),

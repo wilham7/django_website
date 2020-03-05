@@ -21,6 +21,8 @@ class drawingAdmin(admin.ModelAdmin):
         submissionInLine,
     ]
 
+    list_per_page = 1000
+
 class submissionAdmin(admin.ModelAdmin):
     filter_horizontal = ('req_drawings',)
     # inline = [

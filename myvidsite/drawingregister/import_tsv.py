@@ -169,5 +169,5 @@ def makeSubs():
 				print(e)
 
 
-# makeDrawings()
-makeSubs()
+makeDrawings()
+# makeSubs()

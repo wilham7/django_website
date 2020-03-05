@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse
 from django.core import serializers
 from .models import *
@@ -37,6 +37,97 @@ def testing(request):
 	
 
 @csrf_exempt
+# @csrf_protect
+def updateDrawings(request):
+
+	# data = '[{"id":"20", "dn_series":"11"},{"id":"21", "dn_series":"11"}]'
+
+	log = []
+	dn_to_return = []
+
+
+	if request.method == "POST":
+
+		try:
+			createdcount = 0
+			updatecount = 0
+			
+			# data = request.POST["data"]
+			data = request.POST.get('data','')	
+
+				# CHECK WHAT KEY AND VALUE IS COMING THROUGH
+			# for key, value in request.POST.items():
+			# 	print('Key: %s' % (key) ) 
+			# 	print('Value %s' % (value) )
+
+				#EXPLODE OUTER LAYER OF DICT
+			jd = json.loads(data)
+			jd = jd['data']
+
+			log.append(jd)
+
+			for drawing in jd:
+
+				try:
+					exist = get_object_or_404(Drawings, id=drawing['id'])
+					# str_exist = str(exist)
+					# print(str_exist)
+					# dn_to_return.append(get_object_or_404(Drawings, id=drawing['id']))
+					# print('2st checkpoint')
+					# except:
+					# 	dn_to_return.append("Didn't work lol")
+
+
+					# exist = get_object_or_404(Drawings, pk=1)
+					# log.append("hello" + str(exist))
+					# log.append("Object exists")
+
+
+					try:
+						mod, created = Drawings.objects.update_or_create(id=drawing['id'], defaults=drawing)
+						print("mod")
+						print(mod)
+
+						try:
+							# updated = get_object_or_404(Drawings, id=drawing['id'])
+							new = mod.drawing_name
+							dn_to_return.append(new)
+						except Exception as e:
+							print(e)
+								
+
+						if created:
+							createdcount += 1
+						else:
+							updatecount += 1
+					except:
+						log.append("update_or_create failed")
+
+				except:
+					log.append("Object doesn't exist")	
+
+			print('A post')
+			print(dn_to_return)
+			return JsonResponse({'returns':dn_to_return})
+
+		except:
+			return JsonResponse({'Empty data?':''})
+
+
+
+
+
+
+	else:
+
+		print('Not a post')
+		return JsonResponse({'test':"doesn't work"})
+
+
+
+
+
+@csrf_exempt
 def uploadDrawings(request):
 
 	# data = '[{"dn_project":"BBB","dn_originator":"COX","dn_volume_system":"01","dn_type":"DR","dn_discipline":"AR","dn_series":"01","dn_level":"00","dn_zone_sequence":"~01","drawing_title1":"111111111111111111111111111111","drawing_title2":"STANDARD NOTES SYMBOLS & LEGEND","drawing_title3":"","studio":"Sydney","model_location":"Architecture","revision_offset":"","scale":"-","paper":"A2","dwg_type":"register","discipline":"Architectural","phase":"Design Development","originator":"Cox Architects"},{"dn_project":"SFS","dn_originator":"COX","dn_volume_system":"01","dn_type":"DR","dn_discipline":"AR","dn_series":"03","dn_level":"00","dn_zone_sequence":"~01","drawing_title1":"1234qwerasdf","drawing_title2":"STANDARD NOTES SYMBOLS & LEGEND","drawing_title3":"","studio":"Sydney","model_location":"Architecture","revision_offset":"","scale":"-","paper":"A0","dwg_type":"register","discipline":"Architectural","phase":"Design Development","originator":"Cox Architects"}]'
@@ -46,8 +137,6 @@ def uploadDrawings(request):
 
 
 	if request.method == "POST":
-		
-		# jd = json.loads(data)
 		
 
 		data = request.POST["data"]
@@ -82,9 +171,9 @@ def uploadDrawings(request):
 				# values = str(Drawings.objects.values())
 
 				if created:
-					createdcount += 1
+					createdcount = createdcount+ 1
 				else:
-					updatecount += 1
+					updatecount = updatecount + 1
 			except:
 				log.append("update_or_create failed")
 

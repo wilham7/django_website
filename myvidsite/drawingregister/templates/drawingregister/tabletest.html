@@ -3,6 +3,7 @@
 <head>
 	<title></title>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js" crossorigin="anonymous"></script>
 	<link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css">
 	<style>
@@ -20,7 +21,8 @@
 <div style="width:100%" id="example"></div>
 </body>
 
-<h1>Hello World</h1>
+<!-- <h1>Hello World</h1> -->
+{% csrf_token %}
 <script type="text/javascript">
 console.log("hello world")
 
@@ -28,10 +30,11 @@ var data = {{data|safe}};
 // var rowHeaders = ['2017', '2018', '2019']
 var colHeaders= [
 // 'id',
-'dn_project','dn_originator','dn_volume_system','dn_type','dn_discipline','dn_series','dn_level','dn_zone_sequence',]
+'Drawing Number','Project','Originator','Volume or System','Type','Discipline','Series','Level','Zone or Sequence',]
 
 var columns = [
   // {className:"abc",      renderer: myRenderer, data:'id'},
+  {className:"abc",      renderer: myRenderer, data:'drawingNumber', readOnly: true, observeChanges: true},
   {className:"abc",      renderer: myRenderer, data:'dn_project'},
   {className:"enabled",  renderer: myRenderer, data:'dn_originator'},
   {className:"abc",      renderer: myRenderer, data:'dn_volume_system'},
@@ -48,6 +51,7 @@ var columns = [
 var container = document.getElementById('example');
 
 
+var lut = {"drawingNumber":"Drawing Number","dn_project":"Project","dn_originator":"Originator","dn_volume_system":"Volume or System","dn_type":"Type","dn_discipline":"Discipline","dn_series":"Series","dn_level":"Level","dn_zone_sequence":"Zone or Sequence"}
 
 
 var hot = new Handsontable(container, {
@@ -56,6 +60,7 @@ var hot = new Handsontable(container, {
   dataSchema: {id: null, name:{last: null, first: null}, address: null},
   // rowHeaders: true,
   colHeaders: colHeaders,
+  undo: true,
   // width: '100%',
   // stretchH: 'all',
   columns: columns,
@@ -67,6 +72,9 @@ var hot = new Handsontable(container, {
   contextMenu: true,
   manualColumnFreeze: true,
   observeChanges: true,
+  currentRowClassName: 'currentRow',
+  currentColClassName: 'currentCol',
+
 
   // dropdownMenu: true,
   // colHeaders: true,
@@ -88,33 +96,78 @@ var hot = new Handsontable(container, {
     // clearTimeout(autosaveNotification);
     if (source != 'loadData'){
 
-    var payload = {data:[]}
-    console.log(change);
-    // console.log(source);
-    // console.log(this);
-    for ( var i = 0; i < change.length; i ++ ) {
-      // console.log(change[i]);
-      editheaders = this.getColHeader();
-      // console.log(editheaders);
-      col = editheaders.indexOf(change[i][1])
-      var value = this.getCell(change[i][0],col).id;
-      console.log(value, change[i][1], change[i][3]);
-      apob = {id: value}
-      apob[change[i][1]] = change[i][3]
-      payload["data"].push(apob);
+      var payload = {data:[]}
+      var row_dict = {row:[],returns:[]}
+
+      // console.log("change");
+      // console.log(change);
+      // console.log(source);
+      // console.log(this);
+      for ( var i = 0; i < change.length; i ++ ) {
+        editheaders = this.getColHeader();
+        var actualhead = lut[change[i][1]]
+        var col = editheaders.indexOf(actualhead)
+        var row = change[i][0];
+        var value = this.getCell(row,col).id;
+        row_dict["row"].push(row)
+        apob = {id: value}
+        apob[change[i][1]] = change[i][3]
+        payload["data"].push(apob);
       }
-    console.log(payload);
+
+
+      var jsoned_data = JSON.stringify(payload)
+      $.ajax({
+        url:'/dregister/updateDrawings/',
+        data: {data: jsoned_data},
+        dataType: 'json',
+        method: 'POST',
+        success: function (data) {
+          var r = data["returns"]
+          row_dict["returns"] = r;
+          console.log(row_dict)
+          
+          // updateCell(this, row_dict)
+
+          if (data.is_taken) {
+              alert(data.error_message);
+          }
+          console.log("SUCCESS!")
+        }
+      });
+      // console.log(data[0])
+
+      setTimeout(function(){
+
+      console.log(row_dict['row'].length)
+
+      for ( var i = 0; i < row_dict['row'].length; i ++ ){
+        console.log("row_dict['row'][i]")
+        console.log(row_dict['row'][i])
+        // console.log("row_dict")
+        console.log("row_dict['returns'][i]")
+        console.log(row_dict['returns'][i])
+        data[row_dict['row'][i]]['drawingNumber']=row_dict['returns'][i]
+      }
+
+
+
+      },200)
+
+      //   hot.setDataAtCell(row_dict['row'][i],0,row_dict['returns'][i],"changeTitle")
+      // }
     }
-    // console.log(source);
-    // ajax('scripts/json/save.json', 'GET', JSON.stringify({data: change}), function (data) {
-    //   exampleConsole.innerText  = 'Autosaved (' + change.length + ' ' + 'cell' + (change.length > 1 ? 's' : '') + ')';
-    //   autosaveNotification = setTimeout(function() {
-    //     exampleConsole.innerText ='Changes will be autosaved';
-    //   }, 1000);
-    // });
   }
 
 });
+// function updateCell(hot, data) {
+//   console.log("update cell")
+//   console.log(data)
+//   for ( var i = 0; i < data['row'].length; i ++ ){
+//     hot.setDataAtCell(data['row'][i],0,data['returns'][i],"changeTitle")
+//   }
+// }
+
 function myRenderer(instance, td, row, col, prop, value, cellProperties) {
   // Handsontable.TextCell.renderer.apply(this, arguments);
   // Handsontable.renderers.BaseRenderer.apply(this, arguments);
