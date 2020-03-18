@@ -1,0 +1,17 @@
+{% extends "drawingregister/header.html" %}
+
+{% block content %}
+
+    <div>
+      <ul>
+        {% for d in context%}
+            <a href={{d}}>
+                <p>{{d}}</p>
+            </a>
+        {% endfor %}
+
+        </ul>
+    </div>
+
+
+{% endblock %}

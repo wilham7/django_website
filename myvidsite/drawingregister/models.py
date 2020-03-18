@@ -1,4 +1,10 @@
 from django.db import models
+from django.core.files import File
+from os import listdir
+import os, sys
+import os.path
+# from os.path import isfile, join 
+
 
 
 location_choices = (
@@ -89,24 +95,20 @@ class Drawings(models.Model):
 	studio = models.CharField(max_length=200,choices=location_choices,default="Sydney")
 	model_location = models.CharField(max_length=200)
 	revision_offset = models.CharField(max_length=200,blank=True,null=True)
-	#ADD ACONEX REVISION current & to be issued
 	scale = models.CharField(max_length=200,choices=scale_choices,default="100")
 	paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
 	dwg_type = models.CharField(max_length=200,choices=type_choices,default="2D Drawing")
 	discipline = models.CharField(max_length=200,default="Architectural")
-	#Check ACONEX inputs for phase drop down
+	#Check ACONEX inputs for phase drop down list
 	phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
 	originator = models.CharField(max_length=200,default="Cox Architects")
 
 	drawing_name = models.CharField(max_length=200,default="")
 
-	# This isn't really being used
-	def reqSubmissions(self):
-		rs = self.submissions.all()
-		return rs
-
-
-
+	# # This isn't really being used
+	# def reqSubmissions(self):
+	# 	rs = self.submissions.all()
+	# 	return rs
 
 
 	def currentRev(self):
@@ -169,7 +171,85 @@ class Drawings(models.Model):
 
 class Submissions(models.Model):
 	sub_date = models.IntegerField()
+	file_path = models.CharField(max_length=500,default="", blank=True)
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')
+	was_submitted = models.CharField(max_length=500,default="", blank=True)
+
+	# Store of the function for_submission_complete
+	sub_comp = models.CharField(max_length=5000,default="")
+
+	def for_submission_complete(self):
+		dn = []
+		gf = []
+		gf_split = []
+		try:
+			gf = os.listdir(self.file_path)
+			for f in gf:
+				gf_split.append(f.split(".",1)[0])
+		except:
+			return "This is not a valid directory"
+		try:
+			dnames = self.req_drawings.all()
+			for d in dnames:
+				dn.append(d.drawing_name)
+
+			matches = set(dn) & set(gf_split)
+			matches = list(matches)
+			not_matches = set(dn) - set(matches)
+
+			self.sub_comp = matches
+
+
+			output = matches
+			
+			# output["Incomplete"]=not_matches
+
+
+			return output
+		except Exception as e:
+			return e
+
+	def for_submission_incomplete(self):
+		
+		dn = []
+		gf = []
+		gf_split = []
+		try:
+			gf = os.listdir(self.file_path)
+		except:
+			return "This is not a valid directory"
+		try:
+			for f in gf:
+				gf_split.append(f.split(".",1)[0])
+			dnames = self.req_drawings.all()
+			for d in dnames:
+				dn.append(d.drawing_name)
+
+			matches = set(dn) & set(gf_split)
+			not_matches = set(dn) - set(matches)
+			not_matches = list(not_matches)
+
+
+			# for d in dnames:
+			# 	d.append('test')
+
+			output = not_matches
+			# output["Completed"]=matches
+
+			return output
+
+		except Exception as e:
+			return e
+
+
+
+
+
+
+	# submitted_drawings
+
+
+
 
 
 

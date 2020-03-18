@@ -26,8 +26,96 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 	search_fields = ('sub_date',)
 
 # Create your views here.
+
+def postAconex(request, sub_date):
+	sd = sub_date
+	# val = Submissions.objects.get(sub_date=sd)
+
+
+	sub = Submissions.objects.get(sub_date=sd)
+
+	try:
+		val = sub.for_submission_complete()
+		print(val)
+		sub.was_submitted = val
+		print(sub)
+		sub.save()
+
+	except Exception as e:
+		print(e)
+
+
+	# sub = Submissions.objects.filter(sub_date=sd).update(was_submitted= val)
+
+
+	# sub.was_submitted = sub.sub_comp
+	# sub.save()
+	# save = sub.sub_comp
+	# sub.was_submitted = save
+
+
+
+	return JsonResponse({'Test1':str(sub.was_submitted)})
+	# sub.save()
+
+
+
 def homepage(request):
-	return JsonResponse({'key':'value'})
+	return render(request=request,
+				  template_name="drawingregister/home.html",
+				  context={})
+
+def drawings(request):
+	dwgs = Drawings.objects.all()
+
+
+	return render(request=request,
+				  template_name="drawingregister/drawings.html",
+				  context={"context":dwgs})
+
+
+
+
+# def single_drawing(request, single_slug):
+# 	return render(request=request,
+# 				  template_name="drawingregister/single_drawing.html",
+# 				  context={"context":})
+
+
+
+def single_submission(request, single_slug):
+
+	subs = [c.sub_date for c in Submissions.objects.all()]
+
+	if single_slug in subs:
+
+		#Get all series that have the same tutorial_category 
+		matching_sub = Submissions.objects.filter(sub_date=single_slug)
+	
+
+
+		return render(request=request,
+				  	 template_name="drawingregister/single_submission.html",
+				     context={"context":matching_sub})
+
+
+
+
+
+def submissions(request):
+	subs = Submissions.objects.all()
+
+
+	return render(request=request,
+				  template_name="drawingregister/submissions.html",
+				  context={"context":subs})
+
+
+
+
+
+
+
 
 
 def testing(request):
@@ -112,11 +200,6 @@ def updateDrawings(request):
 
 		except:
 			return JsonResponse({'Empty data?':''})
-
-
-
-
-
 
 	else:
 
