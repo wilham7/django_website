@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 from .models import *
 from .serializers import *
 
+import ast
 import json
 
 from rest_framework import viewsets
@@ -27,36 +28,33 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 
 # Create your views here.
 
+
+def newView(request):
+	return JsonResponse({"Test":"It worked!"})
+
 def postAconex(request, sub_date):
+
+	# if request.method == 'GET': 
+	if 'mybtn' in request.GET:
+		print("POSTED")
+
 	sd = sub_date
-	# val = Submissions.objects.get(sub_date=sd)
 
 
 	sub = Submissions.objects.get(sub_date=sd)
 
 	try:
 		val = sub.for_submission_complete()
-		print(val)
+		# print(val)
 		sub.was_submitted = val
-		print(sub)
+		# print(sub)
 		sub.save()
+		print("Updating worked")
 
 	except Exception as e:
 		print(e)
 
-
-	# sub = Submissions.objects.filter(sub_date=sd).update(was_submitted= val)
-
-
-	# sub.was_submitted = sub.sub_comp
-	# sub.save()
-	# save = sub.sub_comp
-	# sub.was_submitted = save
-
-
-
-	return JsonResponse({'Test1':str(sub.was_submitted)})
-	# sub.save()
+	return HttpResponse(status=204)
 
 
 
@@ -74,31 +72,35 @@ def drawings(request):
 				  context={"context":dwgs})
 
 
-
-
-# def single_drawing(request, single_slug):
-# 	return render(request=request,
-# 				  template_name="drawingregister/single_drawing.html",
-# 				  context={"context":})
-
-
-
 def single_submission(request, single_slug):
 
 	subs = [c.sub_date for c in Submissions.objects.all()]
+	subs = list(map(str, subs))
 
 	if single_slug in subs:
 
-		#Get all series that have the same tutorial_category 
-		matching_sub = Submissions.objects.filter(sub_date=single_slug)
-	
+		matching_sub = Submissions.objects.get(sub_date=single_slug)
+
+		sub_dwgs = matching_sub.req_drawings.all()
+		sub_comp = matching_sub.sub_comp
+		was_sub = matching_sub.was_submitted
+		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
+		try:
+			sub_comp = ast.literal_eval(sub_comp)
+		except: 
+			pass
+		try:
+			was_sub = ast.literal_eval(was_sub)
+		except:
+			print("it broke")
+			pass
 
 
 		return render(request=request,
 				  	 template_name="drawingregister/single_submission.html",
-				     context={"context":matching_sub})
+				     context={"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,})
 
-
+	return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
 
 
@@ -109,20 +111,6 @@ def submissions(request):
 	return render(request=request,
 				  template_name="drawingregister/submissions.html",
 				  context={"context":subs})
-
-
-
-
-
-
-
-
-
-def testing(request):
-	drawings = [c.drawingNumber() for c in Drawings.objects.all()]
-	# drawings = str(Drawings.objects.all())
-	return JsonResponse({'Test1':drawings})
-	
 
 @csrf_exempt
 # @csrf_protect
@@ -158,18 +146,6 @@ def updateDrawings(request):
 
 				try:
 					exist = get_object_or_404(Drawings, id=drawing['id'])
-					# str_exist = str(exist)
-					# print(str_exist)
-					# dn_to_return.append(get_object_or_404(Drawings, id=drawing['id']))
-					# print('2st checkpoint')
-					# except:
-					# 	dn_to_return.append("Didn't work lol")
-
-
-					# exist = get_object_or_404(Drawings, pk=1)
-					# log.append("hello" + str(exist))
-					# log.append("Object exists")
-
 
 					try:
 						mod, created = Drawings.objects.update_or_create(id=drawing['id'], defaults=drawing)

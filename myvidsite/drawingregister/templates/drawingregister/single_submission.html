@@ -2,17 +2,54 @@
 
 {% block content %}
 
-    <div>
-      <ul>
-        {{context}}
-            <a href={{d}}>
-                <p>{{d}}</p>
-            </a>
-        {% endfor %}
+    <div class="row">
 
-        </ul>
+        <div class="col s12, m8, l4">
+            <h3>{{submission.sub_date}}</h3>
+            <p style="font-size:70%">All required drawings</p>
+            	<ul>
+            	{% for dwg in sub_dwgs %}
+            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            	{% endfor %}
+
+            	</ul>
+        </div>
+
+        <div class="col s12, m8, l4">
+            <h3 style ="color:White;">.</h3>
+            <p style="font-size:70%">Drawings found in folder</p>
+            	<ul>
+            	{% for dwg in sub_comp %}
+            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            	{% endfor %}
+
+            	</ul>
+        </div>
+
+
+        <div class="col s12, m8, l4">
+            
+			<h3>
+
+		   		<a class="btn btn-primary" href="{% url 'drawingregister:postAconex' sub_date=submission.sub_date%}" name="mybtn">Update 'Submitted'</a>
+
+			</h3>
+            <p style="font-size:70%">Submitted drawings</p>
+            	<ul>
+            	{% for dwg in was_sub %}
+            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            	{% endfor %}
+
+            	</ul>
+        </div>
+
+
+
+
+
+
+
     </div>
-
 
 
 {% endblock %}
