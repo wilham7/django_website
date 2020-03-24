@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
@@ -34,17 +34,11 @@ def newView(request):
 
 def postAconex(request, sub_date):
 
-	# if request.method == 'GET': 
-	if 'mybtn' in request.GET:
-		print("POSTED")
-
 	sd = sub_date
-
-
 	sub = Submissions.objects.get(sub_date=sd)
 
 	try:
-		val = sub.for_submission_complete()
+		val = sub.sub_comp
 		# print(val)
 		sub.was_submitted = val
 		# print(sub)
@@ -54,7 +48,72 @@ def postAconex(request, sub_date):
 	except Exception as e:
 		print(e)
 
-	return HttpResponse(status=204)
+
+
+	# return HttpResponse(status=204)
+	return redirect('/dregister/submissions/'+sd)
+
+def single_submission(request, single_slug):
+
+	subs = [c.sub_date for c in Submissions.objects.all()]
+	subs = list(map(str, subs))
+
+	if single_slug in subs:
+
+		matching_sub = Submissions.objects.get(sub_date=single_slug)
+
+		sub_dwgs = matching_sub.req_drawings.all()
+		try:
+			matching_sub.for_submission_complete()
+			sub_comp = matching_sub.sub_comp
+			sub_dubspace = matching_sub.sub_dubspace
+			sub_nomatch = matching_sub.sub_nomatch
+			was_sub = matching_sub.was_submitted
+
+
+
+		except Exception as e:
+			print(e)
+		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
+		try:
+			sub_comp = ast.literal_eval(sub_comp)
+		except: 
+			print("sub_comp list creator broke")
+		try:
+			was_sub = ast.literal_eval(was_sub)
+		except:
+			print("was sub broke")
+
+		return render(request=request,
+				  	 template_name="drawingregister/single_submission.html",
+				     context={"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,"sub_dubspace":sub_dubspace,"sub_nomatch":sub_nomatch,})
+
+	return HttpResponse(f"{single_slug} couldn't be found in the database.")
+
+
+def single_drawing(request, single_slug):
+
+	dwgs = [c.drawing_name for c in Drawings.objects.all()]
+	dwgs = list(map(str, dwgs))
+
+	if single_slug in dwgs:
+		matching_dwg = Drawings.objects.get(drawing_name=single_slug)
+
+		#Getting the other direction of the manytomany field
+		req_subs = matching_dwg.submissions.all()
+		#Turning the queryset object into a list
+		# req_subs = list(req_subs)
+
+
+		# dwg.subs
+
+
+		return render(request=request,
+					  template_name="drawingregister/single_drawing.html",
+					  context={"this_dwg":matching_dwg,"req_subs":req_subs})
+	else:
+		return HttpResponse(f"{single_slug} couldn't be found in the database.")
+
 
 
 
@@ -70,37 +129,6 @@ def drawings(request):
 	return render(request=request,
 				  template_name="drawingregister/drawings.html",
 				  context={"context":dwgs})
-
-
-def single_submission(request, single_slug):
-
-	subs = [c.sub_date for c in Submissions.objects.all()]
-	subs = list(map(str, subs))
-
-	if single_slug in subs:
-
-		matching_sub = Submissions.objects.get(sub_date=single_slug)
-
-		sub_dwgs = matching_sub.req_drawings.all()
-		sub_comp = matching_sub.sub_comp
-		was_sub = matching_sub.was_submitted
-		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
-		try:
-			sub_comp = ast.literal_eval(sub_comp)
-		except: 
-			pass
-		try:
-			was_sub = ast.literal_eval(was_sub)
-		except:
-			print("it broke")
-			pass
-
-
-		return render(request=request,
-				  	 template_name="drawingregister/single_submission.html",
-				     context={"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,})
-
-	return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
 
 

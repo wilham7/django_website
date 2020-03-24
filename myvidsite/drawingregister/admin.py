@@ -25,11 +25,11 @@ class drawingAdmin(admin.ModelAdmin):
 
 class submissionAdmin(admin.ModelAdmin):
     
-    readonly_fields = ('for_submission_complete','for_submission_incomplete','was_submitted')
+    readonly_fields = ('sub_comp','sub_dubspace','sub_nomatch','sub_incomplete','was_submitted')
 
     filter_horizontal = ('req_drawings',)
 
-    fields = ('sub_date','file_path','req_drawings','for_submission_complete','for_submission_incomplete','was_submitted')
+    fields = ('sub_date','file_path','req_drawings','sub_comp','sub_dubspace','sub_nomatch','sub_incomplete','was_submitted')
     # fieldsets = [
     #     ("To be Submitted", {'fields': ["to_be_submitted",]})
     # ]

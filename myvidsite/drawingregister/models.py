@@ -173,84 +173,102 @@ class Submissions(models.Model):
 	sub_date = models.IntegerField()
 	file_path = models.CharField(max_length=500,default="", blank=True)
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')
+
 	was_submitted = models.CharField(max_length=500,default="", blank=True)
 
-	# Store of the function for_submission_complete
-	sub_comp = models.CharField(max_length=5000,default="")
+	# IS CORRECT
+	sub_comp = models.CharField(max_length=5000,default="", blank=True)
+	# HAS DOUBLE SPACES
+	sub_dubspace = models.CharField(max_length=5000,default="", blank=True)
+	# WAS IN THE FOLDER BUT HAS NO CORRESPONDING FILES
+	sub_nomatch = models.CharField(max_length=5000,default="", blank=True)
+
+	# IN ORIGINAL LIST -> NOT FOUND
+	sub_incomplete = models.CharField(max_length=5000,default="", blank=True)
+
+	#Backup
+	# def for_submission_complete(self):
+	# 	dn = []
+	# 	gf = []
+	# 	gf_split = []
+	# 	try:
+	# 		gf = os.listdir(self.file_path)
+	# 		for f in gf:
+	# 			gf_split.append(f.split(".",1)[0])
+	# 	except:
+	# 		return "This is not a valid directory"
+	# 	try:
+	# 		dnames = self.req_drawings.all()
+	# 		for d in dnames:
+	# 			dn.append(d.drawing_name)
+
+	# 		matches = set(dn) & set(gf_split)
+	# 		matches = list(matches)
+	# 		not_matches = set(dn) - set(matches)
+
+	# 		self.sub_comp = matches
+	# 		output = matches
+	# 		return output
+
+	# 	except Exception as e:
+	# 		return e
 
 	def for_submission_complete(self):
+		print('hello world')
+		#Drawing names as a list
 		dn = []
+		#Get files
 		gf = []
-		gf_split = []
-		try:
-			gf = os.listdir(self.file_path)
-			for f in gf:
-				gf_split.append(f.split(".",1)[0])
-		except:
-			return "This is not a valid directory"
-		try:
-			dnames = self.req_drawings.all()
-			for d in dnames:
-				dn.append(d.drawing_name)
-
-			matches = set(dn) & set(gf_split)
-			matches = list(matches)
-			not_matches = set(dn) - set(matches)
-
-			self.sub_comp = matches
-
-
-			output = matches
-			
-			# output["Incomplete"]=not_matches
-
-
-			return output
-		except Exception as e:
-			return e
-
-	def for_submission_incomplete(self):
+		#Get files split
+		gf_all = []
+		gf_dubspace = []
 		
-		dn = []
-		gf = []
-		gf_split = []
 		try:
 			gf = os.listdir(self.file_path)
+			try:
+				for f in gf:
+					#Removing the file type
+					gf_suffix = f.split(".")[-1]
+					gf_all.append(f.replace("."+gf_suffix,""))
+			except Exception as e:
+				print(e)
 		except:
 			return "This is not a valid directory"
-		try:
-			for f in gf:
-				gf_split.append(f.split(".",1)[0])
-			dnames = self.req_drawings.all()
-			for d in dnames:
-				dn.append(d.drawing_name)
-
-			matches = set(dn) & set(gf_split)
-			not_matches = set(dn) - set(matches)
-			not_matches = list(not_matches)
 
 
-			# for d in dnames:
-			# 	d.append('test')
+		gf_clean = gf_all
+		print(gf_clean)
 
-			output = not_matches
-			# output["Completed"]=matches
-
-			return output
-
-		except Exception as e:
-			return e
-
+		for f in gf_clean:
+			if "  " in f:
+				gf_clean.remove(f)
+				gf_dubspace.append(f)
+		gf_dubspace = list(gf_dubspace)
+		self.sub_dubspace = gf_dubspace 
 
 
+		dnames = self.req_drawings.all()
+		for d in dnames:
+			dn.append(d.drawing_name)
+
+		#Checking for matches
+		gf_matches = set(dn) & set(gf_clean)
+		gf_matches = list(gf_matches)
+		self.sub_comp = gf_matches
 
 
+		gf_notmatches = set(gf_clean) - set(dn)
+		gf_notmatches = list(gf_notmatches) 
+		self.sub_nomatch = gf_notmatches
 
-	# submitted_drawings
+
+		gf_notfound =  set(dn) - set(gf_clean) 
+		gf_notfound = list(gf_notfound) 
+		self.sub_incomplete = gf_notfound
 
 
-
-
+		self.save()
+		return gf_all
 
 
 	def __str__(self):

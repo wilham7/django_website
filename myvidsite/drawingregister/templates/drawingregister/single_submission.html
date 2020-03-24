@@ -7,23 +7,29 @@
         <div class="col s12, m8, l4">
             <h3>{{submission.sub_date}}</h3>
             <p style="font-size:70%">All required drawings</p>
-            	<ul>
+            	<p>
             	{% for dwg in sub_dwgs %}
-            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            		<a href ="{% url 'drawingregister:single_drawing' single_slug=dwg.drawing_name%}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
-
-            	</ul>
+            	</p>
         </div>
 
         <div class="col s12, m8, l4">
             <h3 style ="color:White;">.</h3>
             <p style="font-size:70%">Drawings found in folder</p>
-            	<ul>
+            	<p>
             	{% for dwg in sub_comp %}
-            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            		<a style="color:darkseagreen;" href = {{dwg}}> <p>{{ dwg }}</p> </a>
             	{% endfor %}
 
-            	</ul>
+                {% for dwg in sub_dubspace %}
+                    <p style="color:gold;"> {{dwg}} </p>
+                {% endfor %}
+
+                {% for dwg in sub_nomatch %}
+                    <p style="color:red;"> {{dwg}} </p>
+                {% endfor %}
+            	</p>
         </div>
 
 
@@ -35,12 +41,11 @@
 
 			</h3>
             <p style="font-size:70%">Submitted drawings</p>
-            	<ul>
+            	<p>
             	{% for dwg in was_sub %}
             		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
             	{% endfor %}
-
-            	</ul>
+            	</p>
         </div>
 
 

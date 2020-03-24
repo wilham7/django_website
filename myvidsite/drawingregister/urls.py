@@ -28,7 +28,7 @@ app_name = "drawingregister"
 urlpatterns = [
 	path("", views.homepage, name="homepage"),
     path("drawings/", views.drawings, name="drawings"),
-    # path("drawings/<single_slug>", views.single_drawing, name="single_drawing"),
+    path("drawings/<str:single_slug>/", views.single_drawing, name="single_drawing"),
     path("submissions/", views.submissions, name="submissions"),
     path("submissions/<single_slug>", views.single_submission, name="single_submission"),
 
