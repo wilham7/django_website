@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.files import File
 from os import listdir
+from django.forms import ModelForm
 import os, sys
 import os.path
 # from os.path import isfile, join 
@@ -222,6 +223,12 @@ class Submissions(models.Model):
 		#Get files split
 		gf_all = []
 		gf_dubspace = []
+
+		#Set to defaults at the start
+		self.sub_dubspace = []
+		self.sub_comp = []
+		self.sub_nomatch = []
+		self.sub_incomplete = []
 		
 		try:
 			gf = os.listdir(self.file_path)
@@ -237,6 +244,7 @@ class Submissions(models.Model):
 
 
 		gf_clean = gf_all
+		print("gf_clean")
 		print(gf_clean)
 
 		for f in gf_clean:
@@ -277,3 +285,4 @@ class Submissions(models.Model):
 
 	class Meta:
 		verbose_name_plural = "Submissions"
+

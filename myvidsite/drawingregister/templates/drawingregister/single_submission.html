@@ -9,13 +9,22 @@
             <p style="font-size:70%">All required drawings</p>
             	<p>
             	{% for dwg in sub_dwgs %}
+                    <!-- This is refereing to the url name it was assigned -->
             		<a href ="{% url 'drawingregister:single_drawing' single_slug=dwg.drawing_name%}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
             	</p>
         </div>
 
         <div class="col s12, m8, l4">
-            <h3 style ="color:White;">.</h3>
+           <!--  <h3 style ="color:White;">.</h3> -->
+            <h3>
+                <form method='POST'> 
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </form>
+            </h3>
+
+
             <p style="font-size:70%">Drawings found in folder</p>
             	<p>
             	{% for dwg in sub_comp %}

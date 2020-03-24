@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.core import serializers
 from .models import *
 from .serializers import *
+from .forms import *
 
 import ast
 import json
@@ -58,35 +59,58 @@ def single_submission(request, single_slug):
 	subs = [c.sub_date for c in Submissions.objects.all()]
 	subs = list(map(str, subs))
 
+
+
+
+
 	if single_slug in subs:
 
 		matching_sub = Submissions.objects.get(sub_date=single_slug)
 
+		# FORM
+		form = SubmissionsForm(request.POST or None, instance=matching_sub)
+		if form.is_valid():
+			form.save()
+
+			
 		sub_dwgs = matching_sub.req_drawings.all()
-		try:
-			matching_sub.for_submission_complete()
+		#Run the function in the model to update values
+		matching_sub.for_submission_complete()
+
+		if matching_sub.sub_comp == []:
+			sub_comp = []
+		else:
 			sub_comp = matching_sub.sub_comp
+		if matching_sub.sub_dubspace == []:
+			sub_dubspace = []
+		else:
 			sub_dubspace = matching_sub.sub_dubspace
+		if matching_sub.sub_nomatch == []:
+			sub_nomatch = []
+		else:
 			sub_nomatch = matching_sub.sub_nomatch
+		if matching_sub.was_submitted == []:
+			was_sub = []
+		else:
 			was_sub = matching_sub.was_submitted
 
 
 
-		except Exception as e:
-			print(e)
+
+
 		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
 		try:
 			sub_comp = ast.literal_eval(sub_comp)
 		except: 
-			print("sub_comp list creator broke")
+			print("sub_comp list eval broke")
 		try:
 			was_sub = ast.literal_eval(was_sub)
 		except:
-			print("was sub broke")
+			print("was_sub list eval broke")
 
 		return render(request=request,
 				  	 template_name="drawingregister/single_submission.html",
-				     context={"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,"sub_dubspace":sub_dubspace,"sub_nomatch":sub_nomatch,})
+				     context={"form":form,"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,"sub_dubspace":sub_dubspace,"sub_nomatch":sub_nomatch,})
 
 	return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
