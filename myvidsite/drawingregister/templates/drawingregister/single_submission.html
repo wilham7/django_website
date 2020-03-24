@@ -19,7 +19,7 @@
             <p style="font-size:70%">Drawings found in folder</p>
             	<p>
             	{% for dwg in sub_comp %}
-            		<a style="color:darkseagreen;" href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            		<a style="color:darkseagreen;" href ="{% url 'drawingregister:single_drawing' single_slug=dwg %}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
 
                 {% for dwg in sub_dubspace %}
@@ -43,7 +43,7 @@
             <p style="font-size:70%">Submitted drawings</p>
             	<p>
             	{% for dwg in was_sub %}
-            		<a href = {{dwg}}> <p>{{ dwg }}</p> </a>
+            		<a href ="{% url 'drawingregister:single_drawing' single_slug=dwg %}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
             	</p>
         </div>
