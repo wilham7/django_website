@@ -2,35 +2,48 @@
 
 {% block content %}
 
+
+    <div class="row">
+        <div class="col s12, m8, l4">
+            <h3>{{submission.sub_date}}</h3>
+        </div>
+
+        <div class="col s12, m8, l3">
+            <form method='POST'> 
+                {% csrf_token %}
+                {{ form.as_p }}
+            </form>
+        </div>
+
+        <div class="col s12, m8, l1">
+            <h3 style="vertical-align:bottom" >
+                <a class="waves-effect waves-light btn-small light-green lighten-4" href="{% url 'drawingregister:open_file_path' file_path=submission.file_path%}" name="file_path_btn">
+                <i class="material-icons black-text">folder_open</i>
+                </a>
+            </h3>
+        </div>
+
+        <div class="col s12, m8, l4">
+            <h3 style="vertical-align:bottom" >
+                <a class="btn btn-primary light-green lighten-1" href="{% url 'drawingregister:postAconex' sub_date=submission.sub_date%}" name="mybtn">Update 'Submitted'</a>
+            </h3>
+        </div>
+    </div>
+
+
     <div class="row">
 
         <div class="col s12, m8, l4">
-            <h3>{{submission.sub_date}}</h3>
             <p style="font-size:70%">All required drawings</p>
             	<p>
             	{% for dwg in sub_dwgs %}
                     <!-- This is refereing to the url name it was assigned -->
-            		<a href ="{% url 'drawingregister:single_drawing' single_slug=dwg.drawing_name%}"> <p>{{ dwg }}</p> </a>
+            		<a style="color:#AEB6BF" href ="{% url 'drawingregister:single_drawing' single_slug=dwg.drawing_name%}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
             	</p>
         </div>
 
         <div class="col s12, m8, l4">
-            <h3>
-                <form method='POST'> 
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                </form>
-
-                <a class="waves-effect waves-light btn-small" href="{% url 'drawingregister:open_file_path' file_path=submission.file_path%}" name="file_path_btn">
-                <i class="material-icons">folder_open</i>
-                </a>
-            </h3>
-
-
-
-
-
             <p style="font-size:70%">Drawings found in folder</p>
             	<p>
             	{% for dwg in sub_comp %}
@@ -49,16 +62,10 @@
 
 
         <div class="col s12, m8, l4">
-            
-			<h3>
-
-		   		<a class="btn btn-primary" href="{% url 'drawingregister:postAconex' sub_date=submission.sub_date%}" name="mybtn">Update 'Submitted'</a>
-
-			</h3>
             <p style="font-size:70%">Submitted drawings</p>
             	<p>
             	{% for dwg in was_sub %}
-            		<a href ="{% url 'drawingregister:single_drawing' single_slug=dwg %}"> <p>{{ dwg }}</p> </a>
+            		<a style="color:darkseagreen" href ="{% url 'drawingregister:single_drawing' single_slug=dwg %}"> <p>{{ dwg }}</p> </a>
             	{% endfor %}
             	</p>
         </div>
