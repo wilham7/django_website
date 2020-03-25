@@ -17,9 +17,17 @@
 
         <div class="col s12, m8, l1">
             <h3 style="vertical-align:bottom" >
-                <a class="waves-effect waves-light btn-small light-green lighten-4" href="{% url 'drawingregister:open_file_path' file_path=submission.file_path%}" name="file_path_btn">
-                <i class="material-icons black-text">folder_open</i>
-                </a>
+
+                {% if submission.file_path == "" %}
+                    <a class="waves-effect waves-light btn-small light-green lighten-4" name="file_path_btn">
+                    <i class="material-icons black-text">folder_open</i>
+                    </a>
+                {% else %}
+                    <a class="waves-effect waves-light btn-small light-green lighten-4" href="{% url 'drawingregister:open_file_path' submission.file_path%}" name="file_path_btn">
+                    <i class="material-icons black-text">folder_open</i>
+                    </a>
+                {% endif %}
+
             </h3>
         </div>
 

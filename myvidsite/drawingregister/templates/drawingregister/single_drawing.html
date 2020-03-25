@@ -2,24 +2,24 @@
 
 {% block content %}
 
-	<h3>{{this_dwg.drawing_name}}</h3>
+	<div class="col s12, m8, l4">
 
-	<p> Current Revision: {{this_dwg.currentRev}}    
-	</p>
+		<h3>{{this_dwg.drawing_name}}</h3>
 
-	<p> Next Revision: {{this_dwg.nextRev}}    
-	</p>
-	
-	<p> Required Submissions: 
+		<p> Current Revision: {{this_dwg.currentRev}}</p>
+
+		<p> Next Revision: {{this_dwg.nextRev}}</p>
 		
-		{% for sub in req_subs %}
-			<a href ="{% url 'drawingregister:single_submission' single_slug=sub.sub_date%}">
-			<p> {{sub.sub_date}} </p>
-			</a>
-		{% endfor %}    
+		<p> Required Submissions: 
+			
+			{% for sub in req_subs %}
+				<a href ="{% url 'drawingregister:single_submission' single_slug=sub.sub_date%}">
+				<p> {{sub.sub_date}} </p>
+				</a>
+			{% endfor %}    
 
-	</p>
-	
+		</p>
+	</div>
 
 
 
