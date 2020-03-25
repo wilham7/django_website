@@ -130,10 +130,14 @@ def home(request):
 				  context={"pjs":pjs})	
 
 def single_project(request, pj_slug):
-	return render(request=request,
-				  template_name="drawingregister/single_project.html",
-				  context={"number":pj_slug})	
 
+	pj_numbers = [p.number for p in Projects.objects.all()]
+	if pj_slug in pj_numbers:
+		return render(request=request,
+					  template_name="drawingregister/single_project.html",
+					  context={"number":pj_slug})	
+	else:
+		return redirect('/dregister/')
 
 def open_file_path(request, file_path):
 
@@ -145,28 +149,17 @@ def open_file_path(request, file_path):
 		print(e)
 	return HttpResponse(status=204)
 
-# def homepage(request):
-# 	return render(request=request,
-# 				  template_name="drawingregister/home.html",
-# 				  context={})
-
-def drawings(request):
-	dwgs = Drawings.objects.all()
-
-
+def drawings(request, pj_slug):
+	dwgs = Drawings.objects.filter(project__number = pj_slug)
 	return render(request=request,
 				  template_name="drawingregister/drawings.html",
 				  context={"context":dwgs})
 
-
-
-def submissions(request):
-	subs = Submissions.objects.all()
-
-
+def submissions(request, pj_slug):
+	subs = Submissions.objects.filter(project__number = pj_slug)
 	return render(request=request,
 				  template_name="drawingregister/submissions.html",
-				  context={"context":subs})
+				  context={"context":subs,"pj_slug":pj_slug})
 
 @csrf_exempt
 # @csrf_protect
@@ -238,10 +231,6 @@ def updateDrawings(request):
 		print('Not a post')
 		return JsonResponse({'test':"doesn't work"})
 
-
-
-
-
 @csrf_exempt
 def uploadDrawings(request):
 
@@ -298,7 +287,6 @@ def uploadDrawings(request):
 	
 	else:
 		return JsonResponse({'Error':'ONLY POST REQUESTS'})
-
 
 @csrf_exempt
 def uploadSubmissions(request):

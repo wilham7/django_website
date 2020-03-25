@@ -47,7 +47,8 @@ def single_slug(request, single_slug):
 					   "sidebar": tutorials_from_series,
 					   "this_tutorial_idx": this_tutorial_idx})
 
-	return HttpResponse(f"{single_slug} does not correspond to anything.")
+	# return HttpResponse(f"{single_slug} does not correspond to anything.")
+	return redirect('/dregister/')
 
 
 
