@@ -59,10 +59,6 @@ def single_submission(request, single_slug):
 	subs = [c.sub_date for c in Submissions.objects.all()]
 	subs = list(map(str, subs))
 
-
-
-
-
 	if single_slug in subs:
 
 		matching_sub = Submissions.objects.get(sub_date=single_slug)
@@ -72,7 +68,7 @@ def single_submission(request, single_slug):
 		if form.is_valid():
 			form.save()
 
-			
+
 		sub_dwgs = matching_sub.req_drawings.all()
 		#Run the function in the model to update values
 		matching_sub.for_submission_complete()
@@ -93,10 +89,6 @@ def single_submission(request, single_slug):
 			was_sub = []
 		else:
 			was_sub = matching_sub.was_submitted
-
-
-
-
 
 		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
 		try:
@@ -125,13 +117,6 @@ def single_drawing(request, single_slug):
 
 		#Getting the other direction of the manytomany field
 		req_subs = matching_dwg.submissions.all()
-		#Turning the queryset object into a list
-		# req_subs = list(req_subs)
-
-
-		# dwg.subs
-
-
 		return render(request=request,
 					  template_name="drawingregister/single_drawing.html",
 					  context={"this_dwg":matching_dwg,"req_subs":req_subs})
@@ -140,6 +125,15 @@ def single_drawing(request, single_slug):
 
 
 
+def open_file_path(request, file_path):
+
+	try:
+		path = file_path
+		path = os.path.realpath(file_path)
+		os.startfile(path)
+	except Exception as e:
+		print(e)
+	return HttpResponse(status=204)
 
 def homepage(request):
 	return render(request=request,

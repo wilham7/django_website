@@ -16,13 +16,19 @@
         </div>
 
         <div class="col s12, m8, l4">
-           <!--  <h3 style ="color:White;">.</h3> -->
             <h3>
                 <form method='POST'> 
                     {% csrf_token %}
                     {{ form.as_p }}
                 </form>
+
+                <a class="waves-effect waves-light btn-small" href="{% url 'drawingregister:open_file_path' file_path=submission.file_path%}" name="file_path_btn">
+                <i class="material-icons">folder_open</i>
+                </a>
             </h3>
+
+
+
 
 
             <p style="font-size:70%">Drawings found in folder</p>
