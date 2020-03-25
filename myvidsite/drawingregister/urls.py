@@ -26,7 +26,7 @@ router.register(r'submissions_set', views.SubmissionViewSet)
 app_name = "drawingregister"
 
 urlpatterns = [
-	path("", views.homepage, name="homepage"),
+	path("", views.projects, name="projects"),
     path("drawings/", views.drawings, name="drawings"),
     path("drawings/<str:single_slug>/", views.single_drawing, name="single_drawing"),
     path("submissions/", views.submissions, name="submissions"),

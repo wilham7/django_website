@@ -81,6 +81,19 @@ sequence_LUT = {"00":"00 - Whole Site","00.":"00 - Whole Site","01":"01 - Buildi
 
 
 # Create your models here.
+class Projects(models.Model):
+
+	name = models.CharField(max_length=200)
+	number = models.CharField(max_length=200, unique=True)
+	location = models.CharField(max_length=200,choices=location_choices)
+
+	class Meta:
+		ordering = ['number']
+		verbose_name_plural = "Projects"
+
+	def __str__(self):
+	    return str(self.number+" - "+self.name)
+
 class Drawings(models.Model):
 	dn_project = models.CharField("Project", max_length=200)
 	dn_originator = models.CharField("Originator", max_length=200)
@@ -104,13 +117,9 @@ class Drawings(models.Model):
 	phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
 	originator = models.CharField(max_length=200,default="Cox Architects")
 
+	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
+
 	drawing_name = models.CharField(max_length=200,default="")
-
-	# # This isn't really being used
-	# def reqSubmissions(self):
-	# 	rs = self.submissions.all()
-	# 	return rs
-
 
 	def currentRev(self):
 		cr = self.submissions.all().count()
@@ -173,10 +182,11 @@ class Drawings(models.Model):
 class Submissions(models.Model):
 	sub_date = models.IntegerField()
 	file_path = models.CharField(max_length=500,default="", blank=True)
+
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')
+	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
 
 	was_submitted = models.CharField(max_length=500,default="", blank=True)
-
 	# IS CORRECT
 	sub_comp = models.CharField(max_length=5000,default="", blank=True)
 	# HAS DOUBLE SPACES
@@ -285,4 +295,3 @@ class Submissions(models.Model):
 
 	class Meta:
 		verbose_name_plural = "Submissions"
-

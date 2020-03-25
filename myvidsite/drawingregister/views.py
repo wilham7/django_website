@@ -123,7 +123,11 @@ def single_drawing(request, single_slug):
 	else:
 		return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
-
+def projects(request):
+	pjs = Projects.objects.all()
+	return render(request=request,
+				  template_name="drawingregister/home.html",
+				  context={"pjs":pjs})	
 
 def open_file_path(request, file_path):
 
@@ -135,10 +139,10 @@ def open_file_path(request, file_path):
 		print(e)
 	return HttpResponse(status=204)
 
-def homepage(request):
-	return render(request=request,
-				  template_name="drawingregister/home.html",
-				  context={})
+# def homepage(request):
+# 	return render(request=request,
+# 				  template_name="drawingregister/home.html",
+# 				  context={})
 
 def drawings(request):
 	dwgs = Drawings.objects.all()
