@@ -171,9 +171,6 @@ class Drawings(models.Model):
 
 	class Meta:
 		verbose_name_plural = "Drawings"
-#		verbose_name = "Drawing"
-
-
 	def __str__(self):
 	    return self.drawingNumber()
 
