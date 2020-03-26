@@ -123,6 +123,46 @@ def single_drawing(request, single_slug):
 	else:
 		return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
+
+def transmittal(request, pj_slug):
+	dwgs = Drawings.objects.filter(project__number = pj_slug)
+	dname = [d.drawing_name for d in Drawings.objects.filter(project__number = pj_slug)]
+	dname = list(map(str, dname))
+	subs = Submissions.objects.filter(project__number = pj_slug)
+	sname = [s.sub_date for s in Submissions.objects.filter(project__number = pj_slug)]
+	sname.sort()
+
+	print(sname)
+
+	mylist = []
+	y=0
+	for d in dwgs:
+		x=0
+		sublist = []
+		sublist.append(dname[y])
+		y += 1
+		ds = [x.sub_date for x in d.submissions.all()]
+		try:
+			for s in sname:
+				if s in ds:
+					x += 1
+					sublist.append(x)
+				else:
+					sublist.append(0)
+		except:
+			for s in sname:
+				sublist.append(0)
+		mylist.append(sublist)
+	print(mylist)
+
+
+
+	return render(request=request,
+				  template_name="drawingregister/transmittal.html",
+				  context={"dwgs":dwgs,"subs":subs,"dname":dname,"sname":sname,"mylist":mylist})
+
+
+
 def home(request):
 	pjs = Projects.objects.all()
 	return render(request=request,

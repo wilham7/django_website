@@ -35,13 +35,14 @@ urlpatterns = [
 
     path("<str:pj_slug>/", views.single_project, name="single_project"),
 
+    path("<pj_slug>/transmittal/", views.transmittal, name="transmittal"),
 
 
+    path("postAconex/<str:sub_date>/", views.postAconex, name="postAconex"),
     path("uploadDrawings/", views.uploadDrawings, name="uploadDrawings"),
     path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 	path("uploadSubmissions/", views.uploadSubmissions, name="uploadSubmissions"),
     path("drawingTable/", views.drawingTable, name="drawingTable"), 
-    path("postAconex/<str:sub_date>/", views.postAconex, name="postAconex"),
     path("newView/", views.newView, name="newView"),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
