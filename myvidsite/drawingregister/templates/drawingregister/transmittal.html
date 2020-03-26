@@ -12,7 +12,11 @@
 					</tr>
 					{% for d in dwgs %}
 						<tr>
-							<td>{{d.drawing_name}}</td>
+							<td>
+								<a style="color:black" href="{% url 'drawingregister:single_drawing' d.drawing_name %}">
+									{{d.drawing_name}}
+								</a>
+							</td>
 						</tr>
 					{% endfor %}
 				</thead>
@@ -25,7 +29,11 @@
 				<thead >
 					<tr>
 						{% for s in sname %}
-							<th>{{s}}</th>
+							<th>
+								<a style="color:white" href="{% url 'drawingregister:single_submission' s %}">
+									{{s}}
+								</a>
+							</th>
 						{% endfor %}
 					</tr>
 				</thead>
