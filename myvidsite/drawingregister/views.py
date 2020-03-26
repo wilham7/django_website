@@ -132,15 +132,13 @@ def transmittal(request, pj_slug):
 	sname = [s.sub_date for s in Submissions.objects.filter(project__number = pj_slug)]
 	sname.sort()
 
-	print(sname)
-
 	mylist = []
-	y=0
+	# y=0
 	for d in dwgs:
 		x=0
 		sublist = []
-		sublist.append(dname[y])
-		y += 1
+		# sublist.append(dname[y])
+		# y += 1
 		ds = [x.sub_date for x in d.submissions.all()]
 		try:
 			for s in sname:
@@ -153,15 +151,10 @@ def transmittal(request, pj_slug):
 			for s in sname:
 				sublist.append(0)
 		mylist.append(sublist)
-	print(mylist)
-
-
 
 	return render(request=request,
 				  template_name="drawingregister/transmittal.html",
 				  context={"dwgs":dwgs,"subs":subs,"dname":dname,"sname":sname,"mylist":mylist})
-
-
 
 def home(request):
 	pjs = Projects.objects.all()
