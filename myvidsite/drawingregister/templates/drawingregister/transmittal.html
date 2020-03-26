@@ -10,6 +10,8 @@
 					<tr>
 						<th>Drawing</th>
 					</tr>
+				</thead>
+				<tbody>
 					{% for d in dwgs %}
 						<tr>
 							<td>
@@ -19,12 +21,10 @@
 							</td>
 						</tr>
 					{% endfor %}
-				</thead>
-
+				</tbody>
 			</table>
 		</div>
 		<div class="col s12, m8, l9">
-
 			<table class="highlight centered responsive-table">
 				<thead >
 					<tr>
@@ -37,18 +37,19 @@
 						{% endfor %}
 					</tr>
 				</thead>
-				{% for l in mylist %}
-					<tr>
-						{% for x in l %}
-							{% if x == 0 %}
-								<td></td>
-							{% else %}
-								<td>{{x}}</td>
-							{% endif %}
-						{% endfor %}
-					</tr>
-				{% endfor %}
-
+				<tbody>
+					{% for l in mylist %}
+						<tr>
+							{% for x in l %}
+								{% if x == 0 %}
+									<td></td>
+								{% else %}
+									<td>{{x}}</td>
+								{% endif %}
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</tbody>
 			</table>
 		</div>
 	</row>

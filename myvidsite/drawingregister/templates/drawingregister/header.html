@@ -7,32 +7,20 @@
 
     <style>
 
-      table{
-        empty-cells: show;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-
-
+      tbody {
+        display:block;
+        overflow:auto;
       }
-
-      th {
-        background: #7cb342 ;
-        position: sticky;
-        top: 0;
-        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-        color:white;
+      thead, tbody tr {
+        display:table;
+        width:100%;
+        table-layout:fixed;
       }
-      tr {
-        font-size: 12px;
-        line-height: 0px;
-        min-height: 0px;
-        height: 0px;
+      thead {
+        width: calc( 100% - 1em )
       }
-      td {
-        border: 1px solid blue-grey lighten-4;
+      table {
+        width:100%;
       }
 
       </style>
