@@ -48,10 +48,7 @@ def postAconex(request, sub_date):
 
 	except Exception as e:
 		print(e)
-
-
-
-	# return HttpResponse(status=204)
+# return HttpResponse(status=204)
 	return redirect('/dregister/submissions/'+sd)
 
 def single_submission(request, single_slug):
@@ -67,7 +64,6 @@ def single_submission(request, single_slug):
 		form = SubmissionsForm(request.POST or None, instance=matching_sub)
 		if form.is_valid():
 			form.save()
-
 
 		sub_dwgs = matching_sub.req_drawings.all()
 		#Run the function in the model to update values
@@ -106,7 +102,6 @@ def single_submission(request, single_slug):
 
 	return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
-
 def single_drawing(request, single_slug):
 
 	dwgs = [c.drawing_name for c in Drawings.objects.all()]
@@ -122,7 +117,6 @@ def single_drawing(request, single_slug):
 					  context={"this_dwg":matching_dwg,"req_subs":req_subs})
 	else:
 		return HttpResponse(f"{single_slug} couldn't be found in the database.")
-
 
 def transmittal(request, pj_slug):
 	dwgs = Drawings.objects.filter(project__number = pj_slug)
@@ -166,9 +160,10 @@ def single_project(request, pj_slug):
 
 	pj_numbers = [p.number for p in Projects.objects.all()]
 	if pj_slug in pj_numbers:
+		pj = Projects.objects.get(number=pj_slug)
 		return render(request=request,
 					  template_name="drawingregister/single_project.html",
-					  context={"number":pj_slug})	
+					  context={"number":pj_slug,"pj":pj})	
 	else:
 		return redirect('/dregister/')
 

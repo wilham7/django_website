@@ -7,21 +7,34 @@
 
     <style>
 
+      table {
+        empty-cells: show;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       tbody {
         display:block;
-        overflow:auto;
+        overflow:hidden;
       }
       thead, tbody tr {
         display:table;
         width:100%;
         table-layout:fixed;
+        font-size: 12px;
+        line-height: 0px;
+        min-height: 0px;
+        height: 0px;
       }
       thead {
-        width: calc( 100% - 1em )
+        background: #7cb342;
+        position: sticky;
+        top: 0;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
       }
-      table {
-        width:100%;
+      td{ border-left:0.5px solid #ccc; border-right: 0.5px solid #ccc; border-bottom: 0px solid #000;}
       }
+
+
 
       </style>
 </head>
