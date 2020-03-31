@@ -177,7 +177,7 @@ class Drawings(models.Model):
 
 
 class Submissions(models.Model):
-	sub_date = models.IntegerField(unique=True)
+	sub_date = models.IntegerField()
 	file_path = models.CharField(max_length=500,default="", blank=True)
 
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')
@@ -193,33 +193,6 @@ class Submissions(models.Model):
 
 	# IN ORIGINAL LIST -> NOT FOUND
 	sub_incomplete = models.CharField(max_length=5000,default="", blank=True)
-
-	#Backup
-	# def for_submission_complete(self):
-	# 	dn = []
-	# 	gf = []
-	# 	gf_split = []
-	# 	try:
-	# 		gf = os.listdir(self.file_path)
-	# 		for f in gf:
-	# 			gf_split.append(f.split(".",1)[0])
-	# 	except:
-	# 		return "This is not a valid directory"
-	# 	try:
-	# 		dnames = self.req_drawings.all()
-	# 		for d in dnames:
-	# 			dn.append(d.drawing_name)
-
-	# 		matches = set(dn) & set(gf_split)
-	# 		matches = list(matches)
-	# 		not_matches = set(dn) - set(matches)
-
-	# 		self.sub_comp = matches
-	# 		output = matches
-	# 		return output
-
-	# 	except Exception as e:
-	# 		return e
 
 	def for_submission_complete(self):
 		print('hello world')
@@ -287,8 +260,8 @@ class Submissions(models.Model):
 
 
 	def __str__(self):
-	    return str(self.sub_date)
-
+	    return (str(self.project)+" - "+str(self.sub_date))
 
 	class Meta:
 		verbose_name_plural = "Submissions"
+		unique_together = ('sub_date', 'project')

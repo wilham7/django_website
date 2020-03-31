@@ -122,12 +122,20 @@ def newdwg(request, pj_slug):
 
 def single_submission(request, single_slug):
 
-	subs = [c.sub_date for c in Submissions.objects.all()]
+	# subs = [c.sub_date for c in Submissions.objects.all()]
+	subs = Submissions.objects.all()
 	subs = list(map(str, subs))
+	print(single_slug)
+	print(subs)
+
+	sd = single_slug.split(" ")[-1]
+	pjn = single_slug.split(" ")[0]
+
+
 
 	if single_slug in subs:
 
-		matching_sub = Submissions.objects.get(sub_date=single_slug)
+		matching_sub = Submissions.objects.get(sub_date=sd, project__number=pjn)
 
 		# FORM
 		form = SubmissionsForm(request.POST or None, instance=matching_sub)

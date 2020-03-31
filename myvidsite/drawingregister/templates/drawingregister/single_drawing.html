@@ -13,8 +13,8 @@
 		<p> Required Submissions: 
 			
 			{% for sub in req_subs %}
-				<a href ="{% url 'drawingregister:single_submission' single_slug=sub.sub_date%}">
-				<p> {{sub.sub_date}} </p>
+				<a href ="{% url 'drawingregister:single_submission' single_slug=sub%}">
+				<p> {{sub}} </p>
 				</a>
 			{% endfor %}    
 
