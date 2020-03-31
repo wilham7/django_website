@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import modelform_factory
+from django.forms import modelform_factory, ModelForm
 
 from .models import *
 
@@ -41,6 +41,16 @@ class NewSubForm(forms.ModelForm):
 	class Meta:
 		model = Submissions
 		fields = ['sub_date','req_drawings','project']
-		widgets = {'project': forms.HiddenInput()}
+		labels = {
+			'sub_date':('Submission Date')
+		}
+		help_texts = {
+			'sub_date':('This should be in the format of... Year(XX), Month(XX), Day(XX)')
+		}
+
+		widgets = {'project': forms.HiddenInput(),
+				   
+
+		}
   #           'sub_date': Charfield(attrs={'cols': 80, 'rows': 20}),
   #       }

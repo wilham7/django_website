@@ -173,9 +173,19 @@ def single_submission(request, single_slug):
 		except:
 			print("was_sub list eval broke")
 
+		year = sd[0:2]
+		year = "20"+year
+		month = sd[2:4]
+		print(month[0])
+		if month[0] == "0":
+			print("hi")
+			month = month[1]
+		print(month)
+		day = sd[4:6]
+
 		return render(request=request,
 				  	 template_name="drawingregister/single_submission.html",
-				     context={"form":form,"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,"sub_dubspace":sub_dubspace,"sub_nomatch":sub_nomatch,})
+				     context={"form":form,"submission":matching_sub,"sub_dwgs":sub_dwgs,"sub_comp":sub_comp,"was_sub":was_sub,"sub_dubspace":sub_dubspace,"sub_nomatch":sub_nomatch,"year":year,"month":month,"day":day,})
 
 	return HttpResponse(f"{single_slug} couldn't be found in the database.")
 
