@@ -8,6 +8,7 @@ from .models import *
 from .serializers import *
 from .forms import *
 
+import datetime
 import ast
 import json
 
@@ -38,7 +39,9 @@ def newView(request):
 def postAconex(request, sub_date):
 
 	sd = sub_date
+	print(sd)
 	sub = Submissions.objects.get(sub_date=sd)
+	print(sub)
 
 	try:
 		val = sub.sub_comp
@@ -51,7 +54,7 @@ def postAconex(request, sub_date):
 	except Exception as e:
 		print(e)
 # return HttpResponse(status=204)
-	return redirect('/dregister/submissions/'+sd)
+	return redirect('/dregister/submissions/'+str(sub))
 
 def latest_dwg(request):
 
@@ -125,13 +128,9 @@ def single_submission(request, single_slug):
 	# subs = [c.sub_date for c in Submissions.objects.all()]
 	subs = Submissions.objects.all()
 	subs = list(map(str, subs))
-	print(single_slug)
-	print(subs)
 
 	sd = single_slug.split(" ")[-1]
 	pjn = single_slug.split(" ")[0]
-
-
 
 	if single_slug in subs:
 
@@ -167,20 +166,19 @@ def single_submission(request, single_slug):
 		try:
 			sub_comp = ast.literal_eval(sub_comp)
 		except: 
-			print("sub_comp list eval broke")
+			pass
 		try:
 			was_sub = ast.literal_eval(was_sub)
 		except:
-			print("was_sub list eval broke")
+			pass
 
 		year = sd[0:2]
 		year = "20"+year
 		month = sd[2:4]
-		print(month[0])
 		if month[0] == "0":
-			print("hi")
 			month = month[1]
-		print(month)
+		mydate = datetime.datetime.strptime(month, '%m')
+		month = mydate.strftime('%B')
 		day = sd[4:6]
 
 		return render(request=request,
@@ -261,7 +259,9 @@ def open_file_path(request, file_path):
 		path = os.path.realpath(file_path)
 		os.startfile(path)
 	except Exception as e:
-		print(e)
+		path = os.path.realpath("C:/")
+
+		os.startfile(path)
 	return HttpResponse(status=204)
 
 def drawings(request, pj_slug):
