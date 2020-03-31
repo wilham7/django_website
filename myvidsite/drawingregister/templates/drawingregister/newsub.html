@@ -1,0 +1,28 @@
+{% extends "drawingregister/header.html" %}
+
+{% block content %}
+
+    <div row>
+        <h4>
+            Create a new submission for {{pj_name.name}}
+
+        </h4>
+
+    </div>
+
+    <div row>
+        <div class="col s12, m8, l6">
+            <form method='POST'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn waves-effect waves-light light-green lighten-1" type="submit" name="action">
+                    Add Submission
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+
+{% endblock %}

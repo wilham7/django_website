@@ -33,9 +33,12 @@ urlpatterns = [
     path("submissions/<str:single_slug>/", views.single_submission, name="single_submission"),
     path("submissions/open_file_path/<str:file_path>/", views.open_file_path, name="open_file_path"),
 
-    path("<str:pj_slug>/", views.single_project, name="single_project"),
-
+    path("latest_dwg/", views.latest_dwg, name="latest_dwg"),
+    path("latest_sub/", views.latest_sub, name="latest_sub"),
     path("<pj_slug>/transmittal/", views.transmittal, name="transmittal"),
+    path("<pj_slug>/newsub/", views.newsub, name="newsub"),
+    path("<pj_slug>/newdwg/", views.newdwg, name="newdwg"),
+
 
 
     path("postAconex/<str:sub_date>/", views.postAconex, name="postAconex"),
@@ -43,7 +46,15 @@ urlpatterns = [
     path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 	path("uploadSubmissions/", views.uploadSubmissions, name="uploadSubmissions"),
     path("drawingTable/", views.drawingTable, name="drawingTable"), 
+
+
     path("newView/", views.newView, name="newView"),
+
+    #This url redirects all single strings to home!!
+    path("<str:pj_slug>/", views.single_project, name="single_project"),
+
+
+
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]

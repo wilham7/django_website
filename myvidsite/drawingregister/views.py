@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.core import serializers
+from django.urls import reverse
+from django.contrib import messages
 from .models import *
 from .serializers import *
 from .forms import *
@@ -50,6 +52,73 @@ def postAconex(request, sub_date):
 		print(e)
 # return HttpResponse(status=204)
 	return redirect('/dregister/submissions/'+sd)
+
+def latest_dwg(request):
+
+	latest_d = Drawings.objects.order_by('id')
+	latest_d = latest_d.reverse()
+	latest_d = latest_d[0]
+	latest_d = str(latest_d)
+
+	return redirect('/dregister/drawings/'+latest_d)
+
+def latest_sub(request):
+
+	latest_d = Submissions.objects.order_by('id')
+	latest_d = latest_d.reverse()
+	latest_d = latest_d[0]
+	latest_d = str(latest_d)
+
+	return redirect('/dregister/submissions/'+latest_d)
+
+
+
+def newsub(request, pj_slug):
+	
+	pj_name = Projects.objects.get(number=pj_slug)
+	#Setting initial values for the form - has to match the project of the slug
+	initial_data = {
+		'project':pj_name,
+		}
+	form = NewSubForm(request.POST or None, initial=initial_data)
+	#Need to filter the drawing queryset by the project number
+	form.fields["req_drawings"].queryset = Drawings.objects.filter(project__number = pj_slug)
+
+	if request.method == 'POST':
+		if form.is_valid():
+			form.save()
+			messages.success(request, f"New Submission Created!", extra_tags='successSub')
+			return HttpResponseRedirect(reverse('drawingregister:newsub', args=[pj_slug]))
+		else:
+			messages.error(request, f"This Submission Already Exist")
+
+	return render(request=request,
+			  	 template_name="drawingregister/newsub.html",
+			     context={"form":form,"pj_name":pj_name})
+
+def newdwg(request, pj_slug):
+	
+	pj_name = Projects.objects.get(number=pj_slug)
+	#Setting initial values for the form - has to match the project of the slug
+	initial_data = {
+		'project':pj_name,
+		}
+	form = NewDwgForm(request.POST or None, initial=initial_data)
+	#Need to filter the submissions queryset by the project number..
+	#This only works because the queryset was built within the form since it is a reverse m2m
+	form.fields["submissions"].queryset = Submissions.objects.filter(project__number = pj_slug)
+
+	if request.method == 'POST':
+		if form.is_valid():
+			form.save()
+			messages.success(request, f"New Drawing Created!", extra_tags='successDwg')
+			return HttpResponseRedirect(reverse('drawingregister:newdwg', args=[pj_slug]))
+
+	return render(request=request,
+			  	 template_name="drawingregister/newdwg.html",
+			     context={"form":form,"pj_name":pj_name})
+
+
 
 def single_submission(request, single_slug):
 
@@ -181,7 +250,7 @@ def drawings(request, pj_slug):
 	dwgs = Drawings.objects.filter(project__number = pj_slug)
 	return render(request=request,
 				  template_name="drawingregister/drawings.html",
-				  context={"context":dwgs})
+				  context={"context":dwgs,"pj_slug":pj_slug})
 
 def submissions(request, pj_slug):
 	subs = Submissions.objects.filter(project__number = pj_slug)
@@ -266,18 +335,11 @@ def uploadDrawings(request):
 	
 	log = []
 	values = []
-
-
 	if request.method == "POST":
-		
-
 		data = request.POST["data"]
 		jd = json.loads(data)
 		log.append(jd)
 		# out = {"out": "working"}
-
-
-
 
 		createdcount = 0
 		updatecount = 0

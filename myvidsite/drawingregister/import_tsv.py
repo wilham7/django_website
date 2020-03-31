@@ -170,4 +170,4 @@ def makeSubs():
 
 
 makeDrawings()
-# makeSubs()
+makeSubs()

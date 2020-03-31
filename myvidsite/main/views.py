@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import *
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.urls import reverse
 
 
 def single_slug(request, single_slug):
@@ -53,6 +54,9 @@ def single_slug(request, single_slug):
 
 
 def homepage(request):
+
+	return HttpResponseRedirect(reverse('drawingregister:home'))
+
 	return render(request=request,
 				  template_name="main/categories.html",
 				  context={"categories": TutorialCategory.objects.all})

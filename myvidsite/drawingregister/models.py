@@ -95,19 +95,19 @@ class Projects(models.Model):
 	    return str(self.number+" - "+self.name)
 
 class Drawings(models.Model):
-	dn_project = models.CharField("Project", max_length=200)
-	dn_originator = models.CharField("Originator", max_length=200)
-	dn_volume_system = models.CharField("Volume or System", max_length=200)
-	dn_type = models.CharField("Type", max_length=200)
-	dn_discipline = models.CharField("Discipline", max_length=200)
-	dn_series = models.CharField("Series", max_length=200)
-	dn_level = models.CharField("Level", max_length=200)
-	dn_zone_sequence = models.CharField("Zone or Sequence", max_length=200)
+	dn_project = models.CharField(max_length=200)
+	dn_originator = models.CharField(max_length=200)
+	dn_volume_system = models.CharField(max_length=200)
+	dn_type = models.CharField(max_length=200)
+	dn_discipline = models.CharField(max_length=200)
+	dn_series = models.CharField(max_length=200)
+	dn_level = models.CharField(max_length=200)
+	dn_zone_sequence = models.CharField(max_length=200)
 	drawing_title1 = models.CharField(max_length=200,default="Architectural Services")
 	drawing_title2 = models.CharField(max_length=200)
 	drawing_title3 = models.CharField(max_length=200,blank=True,null=True)
 	studio = models.CharField(max_length=200,choices=location_choices,default="Sydney")
-	model_location = models.CharField(max_length=200)
+	model_location = models.CharField(max_length=200,blank=True,null=True)
 	revision_offset = models.CharField(max_length=200,blank=True,null=True)
 	scale = models.CharField(max_length=200,choices=scale_choices,default="100")
 	paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
@@ -119,7 +119,7 @@ class Drawings(models.Model):
 
 	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
 
-	drawing_name = models.CharField(max_length=200,default="")
+	drawing_name = models.CharField(max_length=200,default="", blank=True)
 
 	def currentRev(self):
 		cr = self.submissions.all().count()
@@ -177,7 +177,7 @@ class Drawings(models.Model):
 
 
 class Submissions(models.Model):
-	sub_date = models.IntegerField()
+	sub_date = models.IntegerField(unique=True)
 	file_path = models.CharField(max_length=500,default="", blank=True)
 
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')

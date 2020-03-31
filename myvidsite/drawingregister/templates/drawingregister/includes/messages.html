@@ -1,7 +1,25 @@
   {% if messages %}
 
     {% for message in messages %}
-      <script>M.toast({html: "{{message}}", classes: 'blue rounded', displayLength:2000})</script>
+    	{% if 'successDwg' in message.extra_tags%}
+      		<script>
+
+	      		var toastHTML = '<span>{{message}}</span> <a class="btn-flat toast-action" href="/dregister/latest_dwg/">Go to</a>'
+
+	      		M.toast({html: toastHTML, classes: "light-green lighten-1 rounded", displayLength:10000})
+			</script>
+
+    	{% elif 'successSub' in message.extra_tags%}
+      		<script>
+
+	      		var toastHTML = '<span>{{message}}</span> <a class="btn-flat toast-action" href="/dregister/latest_sub/">Go to</a>'
+
+	      		M.toast({html: toastHTML, classes: "light-green lighten-1 rounded", displayLength:10000})
+			</script>
+
+      	{% elif message.tags == 'error' %}
+      		<script>M.toast({html: "{{message}}", classes: 'red darken-1 rounded', displayLength:2000})</script>
+      	{% endif %}
     {% endfor %}
 
   {% endif %}
