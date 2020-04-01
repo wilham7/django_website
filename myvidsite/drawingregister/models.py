@@ -80,6 +80,62 @@ level_LUT = {"00":"00 - Datum","B1":"B1 - Lower Basement","L0":"L0 - Basement","
 sequence_LUT = {"00":"00 - Whole Site","00.":"00 - Whole Site","01":"01 - Building Zone A","02":"02 - Building Zone B","03":"03 - Building Zone C","04":"04 - Building Zone D","05":"05 - Building Zone E","06":"06 - Building Zone F","07":"07 - Building Zone G","08":"08 - Building Zone H","09":"09 - Building Zone I","11":"11 - Building Sector 1","12":"12 - Building Sector 2","13":"13 - Building Sector 3","14":"14 - Building Sector 4","15":"15 - Building Sector 5","16":"16 - Building Sector 6","17":"17 - Building Sector 7","18":"18 - Building Sector 8","19":"19 - Building Sector 9","20":"20 - Building Sector 10","21":"21 - Building Sector 11","22":"22 - Building Sector 12","23":"23 - Building Sector 13","24":"24 - Building Sector 14","25":"25 - Building Sector 15","26":"26 - Building Sector 16","27":"27 - Building Sector 17","28":"28 - Building Sector 18","29":"29 - Building Sector 19","30":"30 - Building Sector 20","31":"31 - Building Sector 21","32":"32 - Building Sector 22","33":"33 - Building Sector 23","34":"34 - Building Sector 24"}
 
 
+
+##ANDREW'S SCRIPT FOR MAKING DICTIONARIES IN DATAFIELDS
+# class DataFieldFormField(forms.CharField):
+#     def prepare_value(self, value):
+#         try:
+#             import json
+#             if value =="{}":
+#                 return value
+#             else:
+#                 return json.dumps(value)
+#         except Exception as e:
+#             return value
+
+# class DataField(models.TextField):
+#     def __init__(self, *args, **kwargs):
+#         kwargs['max_length'] = 9999
+#         kwargs['default'] = {}
+#         kwargs['blank'] = True
+#         super().__init__(*args, **kwargs)
+#     def parseString(self, s):
+#         import json
+#         try:
+#             ns = json.loads(s)
+#             return ns
+#         except Exception as e:
+#             return {}
+#     def from_db_value(self, value, expression, connection):
+#         if value is None:
+#             return {}
+#         return self.parseString(value)
+#     def to_python(self, value):
+#         try:
+#             py_val = self.parseString(value)
+#             return py_val
+#         except Exception as e:
+#             return {}
+#     def get_db_prep_save(self, value, connection):
+#         import json
+#         try:
+#             new_value = json.dumps(value)
+#             return json.dumps(value)
+#         except Exception as e:
+#             return json.dumps({"error":str(e)})
+#     def formfield(self, **kwargs):
+#         defaults = {'form_class': DataFieldFormField}
+#         defaults.update(kwargs)
+#         return super().formfield(**defaults)
+# class parentModel(models.Model):
+#     data = DataField()
+
+##ANDREW'S NEW SAVE FUNCTION
+# def save( self, *args, **kw ):
+#         self.checkGeneralTitle()
+#         super( staff, self ).save( *args, **kw )
+
+
 # Create your models here.
 class Projects(models.Model):
 
@@ -113,12 +169,11 @@ class Drawings(models.Model):
 	paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
 	dwg_type = models.CharField(max_length=200,choices=type_choices,default="2D Drawing")
 	discipline = models.CharField(max_length=200,default="Architectural")
-	#Check ACONEX inputs for phase drop down list
 	phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
 	originator = models.CharField(max_length=200,default="Cox Architects")
 
 	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
-
+	data_store = models.TextField(max_length=9999, default="{}")
 	drawing_name = models.CharField(max_length=200,default="", blank=True)
 
 	def currentRev(self):
