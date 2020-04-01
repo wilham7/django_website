@@ -76,6 +76,79 @@ def makeDrawings():
 				print(e)
 
 
+def makeDrawings2():
+	headers = []
+
+	with open("Drawing register.tsv") as tsvfile:
+		read = csv.reader(tsvfile, delimiter='\t')
+		for row in read:
+			headers.append(row)
+			# print(row)
+		keys = headers[0]
+		vals = headers
+		del vals[0]
+
+		print(keys)
+		print('-----------------------')
+
+		all_data = []	
+
+
+		for row in vals:
+			x = 0
+			row_data = {}
+
+			for v in row:
+				val_dict = dict({keys[x]:v})
+				row_data.update(val_dict)
+				x = x + 1
+			all_data.append(row_data)
+
+		# print(all_data)
+
+		good_keys = ['NUMBER - Project','NUMBER - Originator','NUMBER - Volume OR System','NUMBER - Type','NUMBER - Discipline','NUMBER - Series','NUMBER - Level','NUMBER - Zone or Sequence','DRAWING TITLE - Title 1','DRAWING TITLE - Title 2 (Category)','DRAWING TITLE - Title 3','STUDIO RESPONSIBILITY','MODEL LOCATION','REVISION OFFSET','SCALE','PRINT','TYPE','DISCIPLINE','PHASE',]
+
+		all_data_new = []
+
+		for i in all_data:
+			filtered = dict(zip(good_keys, [i[k] for k in good_keys]))
+			all_data_new.append(filtered)
+
+		lut = {"NUMBER - Project":"project","NUMBER - Originator":"originator","NUMBER - Volume OR System":"volume","NUMBER - Type":"type","NUMBER - Discipline":"discipline","NUMBER - Series":"series","NUMBER - Level":"level","NUMBER - Zone or Sequence":"zone","DRAWING TITLE - Title 1":"drawing_title1","DRAWING TITLE - Title 2 (Category)":"drawing_title2","DRAWING TITLE - Title 3":"drawing_title3","STUDIO RESPONSIBILITY":"studio","MODEL LOCATION":"model_location","REVISION OFFSET":"revision_offset","SCALE":"scale","PRINT":"paper","TYPE":"dwg_type","DISCIPLINE":"discipline","PHASE":"phase",}
+		final_data = []
+
+
+		for d in all_data_new:
+			x = 0
+			row_adn = {}
+			for v in d:
+				adn = dict({lut[v]:d[v]})
+				row_adn.update(adn)
+			final_data.append(row_adn)
+
+		print(final_data)
+		post_data = []
+
+		for d in final_data:
+			topost = {'data':json.dumps([d])
+			}
+			post_data.append(topost)
+
+
+		for d in post_data:
+			try:
+				# print(d)
+				r = requests.post(posturl, d)
+				drawing = r.json()
+
+				print(drawing)
+			except Exception as e:
+				print(e)
+
+
+makeDrawings2()
+
+
 
 def makeSubs():
 
@@ -169,5 +242,12 @@ def makeSubs():
 				print(e)
 
 
-makeDrawings()
-makeSubs()
+
+
+
+
+
+
+
+# makeDrawings()
+# makeSubs()

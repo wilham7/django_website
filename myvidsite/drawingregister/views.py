@@ -38,16 +38,11 @@ def newView(request):
 
 def postAconex(request, sub_date):
 
-	sd = sub_date
-	print(sd)
-	sub = Submissions.objects.get(sub_date=sd)
-	print(sub)
+	sub = Submissions.objects.get(sub_date=sub_date)
 
 	try:
-		val = sub.sub_comp
-		# print(val)
-		sub.was_submitted = val
-		# print(sub)
+		val = sub.sub_comp.all()
+		sub.was_submitted.set(val)
 		sub.save()
 		print("Updating worked")
 
@@ -145,40 +140,46 @@ def single_submission(request, single_slug):
 		#Run the function in the model to update values
 		matching_sub.for_submission_complete()
 
-		if matching_sub.sub_comp == []:
-			sub_comp = []
+		if matching_sub.sub_comp == "":
+			sub_comp = ""
 		else:
-			sub_comp = matching_sub.sub_comp
+			sub_comp = matching_sub.sub_comp.all()
+
 		if matching_sub.sub_dubspace == []:
 			sub_dubspace = []
 		else:
 			sub_dubspace = matching_sub.sub_dubspace
+
 		if matching_sub.sub_nomatch == []:
 			sub_nomatch = []
 		else:
 			sub_nomatch = matching_sub.sub_nomatch
-		if matching_sub.was_submitted == []:
-			was_sub = []
-		else:
-			was_sub = matching_sub.was_submitted
 
-		#Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
-		try:
-			sub_comp = ast.literal_eval(sub_comp)
-		except: 
-			pass
-		try:
-			was_sub = ast.literal_eval(was_sub)
-		except:
-			pass
+		if matching_sub.was_submitted == "":
+			was_sub = ""
+		else:
+			was_sub = matching_sub.was_submitted.all()
+
+		# #Sub_comp is coming in as a string that looks like a list so it must be converted into a real list
+		# try:
+		# 	sub_comp = ast.literal_eval(sub_comp)
+		# except: 
+		# 	pass
+		# try:
+		# 	was_sub = ast.literal_eval(was_sub)
+		# except:
+		# 	pass
 
 		year = sd[0:2]
 		year = "20"+year
 		month = sd[2:4]
 		if month[0] == "0":
 			month = month[1]
-		mydate = datetime.datetime.strptime(month, '%m')
-		month = mydate.strftime('%B')
+		try:	
+			mydate = datetime.datetime.strptime(month, '%m')
+			month = mydate.strftime('%B')
+		except:
+			pass
 		day = sd[4:6]
 
 		return render(request=request,
@@ -278,6 +279,7 @@ def submissions(request, pj_slug):
 
 @csrf_exempt
 # @csrf_protect
+
 def updateDrawings(request):
 
 	# data = '[{"id":"20", "dn_series":"11"},{"id":"21", "dn_series":"11"}]'
@@ -350,51 +352,57 @@ def updateDrawings(request):
 def uploadDrawings(request):
 
 	# data = '[{"dn_project":"BBB","dn_originator":"COX","dn_volume_system":"01","dn_type":"DR","dn_discipline":"AR","dn_series":"01","dn_level":"00","dn_zone_sequence":"~01","drawing_title1":"111111111111111111111111111111","drawing_title2":"STANDARD NOTES SYMBOLS & LEGEND","drawing_title3":"","studio":"Sydney","model_location":"Architecture","revision_offset":"","scale":"-","paper":"A2","dwg_type":"register","discipline":"Architectural","phase":"Design Development","originator":"Cox Architects"},{"dn_project":"SFS","dn_originator":"COX","dn_volume_system":"01","dn_type":"DR","dn_discipline":"AR","dn_series":"03","dn_level":"00","dn_zone_sequence":"~01","drawing_title1":"1234qwerasdf","drawing_title2":"STANDARD NOTES SYMBOLS & LEGEND","drawing_title3":"","studio":"Sydney","model_location":"Architecture","revision_offset":"","scale":"-","paper":"A0","dwg_type":"register","discipline":"Architectural","phase":"Design Development","originator":"Cox Architects"}]'
-	
 	log = []
 	values = []
 	if request.method == "POST":
 		data = request.POST["data"]
 		jd = json.loads(data)
-		log.append(jd)
-		# out = {"out": "working"}
+		jd = jd[0]
+		pj = Projects.objects.get(number='218018.00')
+		try:
+			Drawings.objects.create(data_store=jd,project=pj)
+			print("Create worked?")
+			# values = str(Drawings.objects.values())
+		except Exception as e:
+			print(e)			
 
-		createdcount = 0
-		updatecount = 0
 
-		for drawing in jd:
+		return JsonResponse({'test':'test'})
 
-			dnum = drawing['dn_project'] + "-" + drawing['dn_originator'] + "-" + drawing['dn_volume_system'] + "-" + drawing['dn_type'] + "-" + drawing['dn_discipline'] + drawing['dn_series'] + drawing['dn_level'] + drawing['dn_zone_sequence']
-			dnum = str(dnum).replace("~","")	
 
-			log.append(dnum)
+	# 	for drawing in jd:
+
+	# 		dnum = drawing['dn_project'] + "-" + drawing['dn_originator'] + "-" + drawing['dn_volume_system'] + "-" + drawing['dn_type'] + "-" + drawing['dn_discipline'] + drawing['dn_series'] + drawing['dn_level'] + drawing['dn_zone_sequence']
+	# 		dnum = str(dnum).replace("~","")	
+
+	# 		log.append(dnum)
 			
 
-			try:
-				exist = get_object_or_404(Drawings, dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence']) 
-				# exist = get_object_or_404(Drawings, pk=1)
-				log.append("hello" + str(exist))
-				log.append("Object exists")
-			except:
-				log.append("Object doesn't exist")
+	# 		try:
+	# 			exist = get_object_or_404(Drawings, dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence']) 
+	# 			# exist = get_object_or_404(Drawings, pk=1)
+	# 			log.append("hello" + str(exist))
+	# 			log.append("Object exists")
+	# 		except:
+	# 			log.append("Object doesn't exist")
 
-			try:
-				mod, created = Drawings.objects.update_or_create(dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence'], defaults=drawing)
-				# values = str(Drawings.objects.values())
+	# 		try:
+	# 			mod, created = Drawings.objects.update_or_create(dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence'], defaults=drawing)
+	# 			# values = str(Drawings.objects.values())
 
-				if created:
-					createdcount = createdcount+ 1
-				else:
-					updatecount = updatecount + 1
-			except:
-				log.append("update_or_create failed")
+	# 			if created:
+	# 				createdcount = createdcount+ 1
+	# 			else:
+	# 				updatecount = updatecount + 1
+	# 		except:
+	# 			log.append("update_or_create failed")
 
 
-			return JsonResponse({'Created count':createdcount,'Updated count':updatecount})
-			# return JsonResponse({'Log':log,'Created count':createdcount,'Objects':values})
+	# 		return JsonResponse({'Created count':createdcount,'Updated count':updatecount})
+	# 		# return JsonResponse({'Log':log,'Created count':createdcount,'Objects':values})
 	
-	else:
-		return JsonResponse({'Error':'ONLY POST REQUESTS'})
+	# else:
+	# 	return JsonResponse({'Error':'ONLY POST REQUESTS'})
 
 @csrf_exempt
 def uploadSubmissions(request):

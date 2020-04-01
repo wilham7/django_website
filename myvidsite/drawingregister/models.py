@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files import File
 from os import listdir
 from django.forms import ModelForm
+from django import forms
 import os, sys
 import os.path
 # from os.path import isfile, join 
@@ -82,58 +83,58 @@ sequence_LUT = {"00":"00 - Whole Site","00.":"00 - Whole Site","01":"01 - Buildi
 
 
 ##ANDREW'S SCRIPT FOR MAKING DICTIONARIES IN DATAFIELDS
-# class DataFieldFormField(forms.CharField):
-#     def prepare_value(self, value):
-#         try:
-#             import json
-#             if value =="{}":
-#                 return value
-#             else:
-#                 return json.dumps(value)
-#         except Exception as e:
-#             return value
+class DataFieldFormField(forms.CharField):
+    def prepare_value(self, value):
+        try:
+            import json
+            if value =="{}":
+                return value
+            else:
+                return json.dumps(value)
+        except Exception as e:
+            return value
 
-# class DataField(models.TextField):
-#     def __init__(self, *args, **kwargs):
-#         kwargs['max_length'] = 9999
-#         kwargs['default'] = {}
-#         kwargs['blank'] = True
-#         super().__init__(*args, **kwargs)
-#     def parseString(self, s):
-#         import json
-#         try:
-#             ns = json.loads(s)
-#             return ns
-#         except Exception as e:
-#             return {}
-#     def from_db_value(self, value, expression, connection):
-#         if value is None:
-#             return {}
-#         return self.parseString(value)
-#     def to_python(self, value):
-#         try:
-#             py_val = self.parseString(value)
-#             return py_val
-#         except Exception as e:
-#             return {}
-#     def get_db_prep_save(self, value, connection):
-#         import json
-#         try:
-#             new_value = json.dumps(value)
-#             return json.dumps(value)
-#         except Exception as e:
-#             return json.dumps({"error":str(e)})
-#     def formfield(self, **kwargs):
-#         defaults = {'form_class': DataFieldFormField}
-#         defaults.update(kwargs)
-#         return super().formfield(**defaults)
-# class parentModel(models.Model):
-#     data = DataField()
+class DataField(models.TextField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 9999
+        kwargs['default'] = {}
+        kwargs['blank'] = True
+        super().__init__(*args, **kwargs)
+    def parseString(self, s):
+        import json
+        try:
+            ns = json.loads(s)
+            return ns
+        except Exception as e:
+            return {}
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return {}
+        return self.parseString(value)
+    def to_python(self, value):
+        try:
+            py_val = self.parseString(value)
+            return py_val
+        except Exception as e:
+            return {}
+    def get_db_prep_save(self, value, connection):
+        import json
+        try:
+            new_value = json.dumps(value)
+            return json.dumps(value)
+        except Exception as e:
+            return json.dumps({"error":str(e)})
+    def formfield(self, **kwargs):
+        defaults = {'form_class': DataFieldFormField}
+        defaults.update(kwargs)
+        return super().formfield(**defaults)
+class parentModel(models.Model):
+    data = DataField()
 
 ##ANDREW'S NEW SAVE FUNCTION
-# def save( self, *args, **kw ):
-#         self.checkGeneralTitle()
-#         super( staff, self ).save( *args, **kw )
+def save( self, *args, **kw ):
+	self.checkGeneralTitle()
+	super( staff, self ).save( *args, **kw )
 
 
 # Create your models here.
@@ -142,6 +143,7 @@ class Projects(models.Model):
 	name = models.CharField(max_length=200)
 	number = models.CharField(max_length=200, unique=True)
 	location = models.CharField(max_length=200,choices=location_choices)
+	namingConv = DataField()
 
 	class Meta:
 		ordering = ['number']
@@ -151,29 +153,29 @@ class Projects(models.Model):
 	    return str(self.number+" - "+self.name)
 
 class Drawings(models.Model):
-	dn_project = models.CharField(max_length=200)
-	dn_originator = models.CharField(max_length=200)
-	dn_volume_system = models.CharField(max_length=200)
-	dn_type = models.CharField(max_length=200)
-	dn_discipline = models.CharField(max_length=200)
-	dn_series = models.CharField(max_length=200)
-	dn_level = models.CharField(max_length=200)
-	dn_zone_sequence = models.CharField(max_length=200)
-	drawing_title1 = models.CharField(max_length=200,default="Architectural Services")
-	drawing_title2 = models.CharField(max_length=200)
-	drawing_title3 = models.CharField(max_length=200,blank=True,null=True)
-	studio = models.CharField(max_length=200,choices=location_choices,default="Sydney")
-	model_location = models.CharField(max_length=200,blank=True,null=True)
-	revision_offset = models.CharField(max_length=200,blank=True,null=True)
-	scale = models.CharField(max_length=200,choices=scale_choices,default="100")
-	paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
-	dwg_type = models.CharField(max_length=200,choices=type_choices,default="2D Drawing")
-	discipline = models.CharField(max_length=200,default="Architectural")
-	phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
-	originator = models.CharField(max_length=200,default="Cox Architects")
+	# dn_project = models.CharField(max_length=200,blank=True,null=True)
+	# dn_originator = models.CharField(max_length=200,blank=True,null=True)
+	# dn_volume_system = models.CharField(max_length=200,blank=True,null=True)
+	# dn_type = models.CharField(max_length=200,blank=True,null=True)
+	# dn_discipline = models.CharField(max_length=200,blank=True,null=True)
+	# dn_series = models.CharField(max_length=200,blank=True,null=True)
+	# dn_level = models.CharField(max_length=200,blank=True,null=True)
+	# dn_zone_sequence = models.CharField(max_length=200,blank=True,null=True)
+	# drawing_title1 = models.CharField(max_length=200,default="Architectural Services")
+	# drawing_title2 = models.CharField(max_length=200)
+	# drawing_title3 = models.CharField(max_length=200,blank=True,null=True)
+	# studio = models.CharField(max_length=200,choices=location_choices,default="Sydney")
+	# model_location = models.CharField(max_length=200,blank=True,null=True)
+	# revision_offset = models.CharField(max_length=200,blank=True,null=True)
+	# scale = models.CharField(max_length=200,choices=scale_choices,default="100")
+	# paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
+	# dwg_type = models.CharField(max_length=200,choices=type_choices,default="2D Drawing")
+	# discipline = models.CharField(max_length=200,default="Architectural")
+	# phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
+	# originator = models.CharField(max_length=200,default="Cox Architects")
 
-	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
-	data_store = models.TextField(max_length=9999, default="{}")
+	project = models.ForeignKey(Projects, on_delete=models.CASCADE,blank=True,null=True)
+	data_store = DataField()
 	drawing_name = models.CharField(max_length=200,default="", blank=True)
 
 	def currentRev(self):
@@ -185,49 +187,56 @@ class Drawings(models.Model):
 		return cr		
 
 
-	def revitSheetNumber(self):
-		rsn = self.dn_discipline + self.dn_series + self.dn_level + self.dn_zone_sequence
-		rsn = str(rsn).replace("~","")
-		return rsn
+	# def revitSheetNumber(self):
+	# 	rsn = self.dn_discipline + self.dn_series + self.dn_level + self.dn_zone_sequence
+	# 	rsn = str(rsn).replace("~","")
+	# 	return rsn
 
-	def drawingNumber(self):
-		dn = self.dn_project + "-" + self.dn_originator + "-" + self.dn_volume_system + "-" + self.dn_type + "-" + self.revitSheetNumber()
-		dn = str(dn).replace("~","")
-		self.drawing_name = dn
-		self.save()
-		return dn
+	# def drawingNumber(self):
+	# 	dn = self.dn_project + "-" + self.dn_originator + "-" + self.dn_volume_system + "-" + self.dn_type + "-" + self.revitSheetNumber()
+	# 	dn = str(dn).replace("~","")
+	# 	self.drawing_name = dn
+	# 	self.save()
+	# 	return dn
 
-	def drawingTitle(self):
-		if self.drawing_title3 == "" or self.drawing_title3 == "-":
-			dt = self.drawing_title2
-		else:
-			try:
-				dt = self.drawing_title2 + "-" + self.drawing_title3
-			except:
-				dt = self.drawing_title2
-		return dt
+	# def drawingNumber(self):
+	# 	dn = "placeholder" + "-" + str(self.pk) 
+	# 	# dn = str(dn).replace("~","")
+	# 	self.drawing_name = dn
+	# 	self.save()
+	# 	return dn
 
-	def level(self):
-		try:
-			lvl = level_LUT[self.dn_level]
-		except:
-			lvl = "Null"
-		return lvl
+	# def drawingTitle(self):
+	# 	if self.drawing_title3 == "" or self.drawing_title3 == "-":
+	# 		dt = self.drawing_title2
+	# 	else:
+	# 		try:
+	# 			dt = self.drawing_title2 + "-" + self.drawing_title3
+	# 		except:
+	# 			dt = self.drawing_title2
+	# 	return dt
 
-	def sequence(self):
-		try:
-			if "~" in str(self.dn_zone_sequence):
-				sq = "01-99 - Default Sequence"
-			else:
-				sq = sequence_LUT[self.dn_zone_sequence]
-		except:
-			sq = "Not a valid zone_sequence"
-		return sq
+	# def level(self):
+	# 	try:
+	# 		lvl = level_LUT[self.dn_level]
+	# 	except:
+	# 		lvl = "Null"
+	# 	return lvl
+
+	# def sequence(self):
+	# 	try:
+	# 		if "~" in str(self.dn_zone_sequence):
+	# 			sq = "01-99 - Default Sequence"
+	# 		else:
+	# 			sq = sequence_LUT[self.dn_zone_sequence]
+	# 	except:
+	# 		sq = "Not a valid zone_sequence"
+	# 	return sq
 
 	class Meta:
 		verbose_name_plural = "Drawings"
-	def __str__(self):
-	    return self.drawingNumber()
+	# def __str__(self):
+	#     return self.drawingNumber()
 
 
 
@@ -238,19 +247,19 @@ class Submissions(models.Model):
 	req_drawings = models.ManyToManyField('Drawings', blank=True, related_name='submissions')
 	project = models.ForeignKey(Projects, on_delete=models.CASCADE)
 
-	was_submitted = models.CharField(max_length=500,default="", blank=True)
-	# IS CORRECT
-	sub_comp = models.CharField(max_length=5000,default="", blank=True)
+	was_submitted = models.ManyToManyField('Drawings', blank=True, related_name='submissions_was_sub')
+
+
+	# FILE IS CORRECT
+	sub_comp = models.ManyToManyField('Drawings', blank=True, related_name='submissions_comp')
 	# HAS DOUBLE SPACES
 	sub_dubspace = models.CharField(max_length=5000,default="", blank=True)
 	# WAS IN THE FOLDER BUT HAS NO CORRESPONDING FILES
 	sub_nomatch = models.CharField(max_length=5000,default="", blank=True)
-
 	# IN ORIGINAL LIST -> NOT FOUND
 	sub_incomplete = models.CharField(max_length=5000,default="", blank=True)
 
 	def for_submission_complete(self):
-		print('hello world')
 		#Drawing names as a list
 		dn = []
 		#Get files
@@ -261,10 +270,10 @@ class Submissions(models.Model):
 
 		#Set to defaults at the start
 		self.sub_dubspace = []
-		self.sub_comp = []
+		self.sub_comp.clear()
 		self.sub_nomatch = []
 		self.sub_incomplete = []
-		
+
 		try:
 			gf = os.listdir(self.file_path)
 			try:
@@ -276,12 +285,9 @@ class Submissions(models.Model):
 				print(e)
 		except:
 			return "This is not a valid directory"
-
+		
 
 		gf_clean = gf_all
-		print("gf_clean")
-		print(gf_clean)
-
 		for f in gf_clean:
 			if "  " in f:
 				gf_clean.remove(f)
@@ -297,8 +303,9 @@ class Submissions(models.Model):
 		#Checking for matches
 		gf_matches = set(dn) & set(gf_clean)
 		gf_matches = list(gf_matches)
-		self.sub_comp = gf_matches
 
+		to_add = self.req_drawings.filter(drawing_name__in=gf_matches)
+		self.sub_comp.set(to_add)
 
 		gf_notmatches = set(gf_clean) - set(dn)
 		gf_notmatches = list(gf_notmatches) 

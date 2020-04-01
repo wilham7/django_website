@@ -19,10 +19,11 @@ class NewDwgForm(forms.ModelForm):
 	submissions = forms.ModelMultipleChoiceField(Submissions.objects.all())
 	class Meta:
 		model = Drawings
-		fields = ['project','dn_project','dn_originator','dn_volume_system','dn_type','dn_discipline','dn_series','dn_level','dn_zone_sequence','drawing_title1','drawing_title2','drawing_title3','studio','model_location','revision_offset','scale','paper','dwg_type','discipline','phase','originator',
-		'submissions',
+		# fields = ['project','dn_project','dn_originator','dn_volume_system','dn_type','dn_discipline','dn_series','dn_level','dn_zone_sequence','drawing_title1','drawing_title2','drawing_title3','studio','model_location','revision_offset','scale','paper','dwg_type','discipline','phase','originator',
+		# 'submissions',
 
-		]
+		# ]
+		fields = ['data_store']
 		widgets = {'project': forms.HiddenInput()}
 
 	#This is some function that saves the special reverse m2m field 
