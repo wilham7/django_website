@@ -22,7 +22,7 @@ class drawingAdmin(admin.ModelAdmin):
 
     # ]
 
-    fields = ('project','data_store')
+    fields = ('project','data_store','drawing_name')
 
     inlines = [
         submissionInLine,

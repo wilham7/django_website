@@ -3,6 +3,7 @@ from django.core.files import File
 from os import listdir
 from django.forms import ModelForm
 from django import forms
+import ast
 import os, sys
 import os.path
 # from os.path import isfile, join 
@@ -143,7 +144,7 @@ class Projects(models.Model):
 	name = models.CharField(max_length=200)
 	number = models.CharField(max_length=200, unique=True)
 	location = models.CharField(max_length=200,choices=location_choices)
-	namingConv = DataField()
+	namingConv = models.TextField(max_length=9999, default="[]")
 
 	class Meta:
 		ordering = ['number']
@@ -178,13 +179,30 @@ class Drawings(models.Model):
 	data_store = DataField()
 	drawing_name = models.CharField(max_length=200,default="", blank=True)
 
-	def currentRev(self):
-		cr = self.submissions.all().count()
-		return cr
 
-	def nextRev(self):
-		cr = self.submissions.all().count() + 1
-		return cr		
+	def drawingName(self):
+		dname = []
+		nConv = self.project.namingConv
+		nConv = ast.literal_eval(nConv)
+		for part in nConv:
+			if part in self.data_store:
+				dname.append(self.data_store.get(part))
+			else:
+				dname.append(part)
+		dname = "".join(dname)
+		self.drawing_name = dname
+		self.save()
+		return dname
+
+
+
+	# def currentRev(self):
+	# 	cr = self.submissions.all().count()
+	# 	return cr
+
+	# def nextRev(self):
+	# 	cr = self.submissions.all().count() + 1
+	# 	return cr		
 
 
 	# def revitSheetNumber(self):
@@ -235,8 +253,8 @@ class Drawings(models.Model):
 
 	class Meta:
 		verbose_name_plural = "Drawings"
-	# def __str__(self):
-	#     return self.drawingNumber()
+	def __str__(self):
+	    return self.drawing_name
 
 
 

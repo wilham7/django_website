@@ -34,6 +34,9 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 
 
 def newView(request):
+	objs = Drawings.objects.all()
+	for d in objs:
+		d.drawingName()
 	return JsonResponse({"Test":"It worked!"})
 
 def postAconex(request, sub_date):
