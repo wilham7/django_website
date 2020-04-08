@@ -41,6 +41,15 @@ def newView(request):
 		d.drawingName()
 	return JsonResponse({"Status":"Drawing names updated"})
 
+def dictTest(request):
+	dwg = Drawings.objects.get(drawing_name="SFS-COX-01-DR-AR24L402")
+	dwgdict = dwg.data_store
+	return JsonResponse({"test":dwgdict})
+
+
+
+
+
 def postAconex(request, sub_date):
 
 	sub = Submissions.objects.get(sub_date=sub_date)
@@ -454,7 +463,7 @@ def uploadSubmissions(request):
 					except Exception as e:
 						print(e)
 
-						
+
 				#Creating
 				except:
 					pj = Projects.objects.get(number='218018.00')
@@ -487,8 +496,34 @@ def uploadSubmissions(request):
 
 def drawingTable(request):
 	import json
-	allDrawings = DrawingSerializer(Drawings.objects.all(), many=True).data
+
+	tableHeads = {"id":"ID"}
+
+	# allDwg = Drawings.objects.all()
+	allDwg = Drawings.objects.all()[:5]
+	for d in allDwg:
+		ddict = d.data_store
+		for k in ddict:
+			if k in tableHeads:
+				pass
+			else:
+				tableHeads["data_store."+k] = (str(k).capitalize()).replace("_"," ") 
+
+
+
+	allDrawings = DrawingSerializer(allDwg, many=True).data
 	context = {
-	"data":json.dumps(allDrawings)
+	"params":tableHeads,"data":json.dumps(allDrawings)
 	}
-	return render(request,"drawingregister/tabletest.html",context)
+
+	return render(request,"drawingregister/drawing_table.html",context)
+
+
+	# return JsonResponse({"Test":str(context)})
+
+
+	# allDrawings = DrawingSerializer(Drawings.objects.all(), many=True).data
+	# context = {
+	# "data":json.dumps(allDrawings)
+	# }
+

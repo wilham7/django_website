@@ -49,6 +49,7 @@ urlpatterns = [
 
 
     path("newView/", views.newView, name="newView"),
+    path("dictTest/", views.dictTest, name="dictTest"),
 
     #This url redirects all single strings to home!!
     path("<str:pj_slug>/", views.single_project, name="single_project"),

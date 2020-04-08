@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <!-- AJAX -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- Handsontable -->
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@7.4.2/dist/handsontable.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/handsontable@7.4.2/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+
+  <!-- pikaday calendar -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+  <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+
+  <!-- moment js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+  <!-- Bootstrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand&display=swap" rel="stylesheet">
+
+  <!-- Latest Sortable -->
+  <script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+</head>
+<body>
+  
+  <div style="padding-top: 10px;">
+    <div id="example"></div>
+  </div>
+
+  <div class="alert-messages"></div>
+
+  <script type="text/javascript">
+
+    var data = {{data|safe}} // Drawing data_store
+
+    var data_lut = {{params|safe}} // Parameter dictionary {"project": "Project", "model_location", "Model Location"}
+
+    // var data_filt_params = {{context.params_filter|safe}}
+
+    var columns_setup = []
+
+    dbHeaders = []
+    cHeaders = []
+    
+    $.each( data_lut, function( key, value ) {
+      cHeaders.push(value);
+      dbHeaders.push(key);
+    });
+
+    var column_order = [];
+    var column_id_order = [];
+    var favourite = [];
+
+    // ------------------ PREDEFINE PER EACH USE ------------------
+
+    // Parameters to always be selected, but can be unselected after
+    var param_always_show = ["element_id", "room_name"]
+
+    var localStorage_toShow = "rm_last_columns_toshow"
+    var localStorage_columnsOrder = "rm_last_columns_order"
+    var localStorage_idOrder = "rm_last_columns_id_order"
+
+    // var base_renderer = myRenderer
+
+    // var renderer_lut = {
+    //  "element_id": {
+    //    "readOnly": true
+    //  },
+    //  "room_type_name": {
+    //    "type": "autocomplete",
+    //    "source": data_rt,
+    //    "renderer": roomTypeRenderer
+    //  },
+    //  "data.Area": {
+    //    "type": "numeric",
+    //    "renderer": areaRenderer
+    //  },
+    //  "data.Unbounded+Height" :{
+    //    "type": "numeric",
+    //    "renderer": areaRenderer  
+    //  },
+    //  "data.isGFA": {
+    //    "renderer": booleanRenderer
+    //  }
+    // }
+
+    // Record Changes Variables
+
+    // Make sure you don't override any of these column values
+    // var do_not_edit = ["Element ID", "Source File", "Number"]
+
+    // Headers that aren't in the data field
+    // var base_headers = ["element_id", "room_name", "room_type_name", "source_file"]
+
+    // var unique_identifier_colHeader = "ID"
+    // var unique_identifier_dataHeader = "id"
+
+    // var posturl = '/bd/capi/updateRooms/'
+
+  </script>
+
+  <!-- REFERENCE SCRIPTS HERE TBC -->
+
+  <!--  -->
+
+  <script type="text/javascript">
+
+    var columns = [
+      {data:'id', readOnly: true, observeChanges: true},
+      {data:'data_store.level'},
+      {data:'data_store.phase'},
+      {data:'data_store.paper'},
+      {data:'data_store.series'},
+      {data:'data_store.volume'},
+      {data:'data_store.type'},
+    ]
+
+    // CONFIGURATIONS
+
+    var configurations = {
+      licenseKey: 'non-commercial-and-evaluation',
+
+      data: data,
+
+      columns: columns,
+      // columns: columns_setup,
+      colHeaders: cHeaders,
+
+      // maxRows: 10,
+
+      autoColumnSize: true,
+      fixedColumnsLeft: 2,
+      hiddenColumns: {
+        indicators: true,
+        copyPasteEnabled: false
+      },
+
+      manualColumnMove: true,
+      manualColumnResize: true,
+
+      // contextMenu: ['filter_by_condition', 'filter_operators', 'filter_by_condition2', 'filter_by_value', 'filter_action_bar'],
+      // dropdownMenu: true,
+      // filters: true,
+      search: true,
+      formulas: true,
+      filters: true,
+      dropdownMenu: ['filter_by_condition', 'filter_operators', 'filter_by_condition2', 'filter_by_value', 'filter_action_bar'],
+      undo: true,
+
+      currentRowClassName: 'currentRow',
+      currentColClassName: 'currentCol',
+      selectionMode: 'multiple',
+      
+      renderAllRows: true,
+      multiColumnSorting: true,
+      sortIndicator: true,
+      persistentState: true,
+
+      // Functions
+      // afterGetColHeader: addInput,
+      // beforeOnCellMouseDown: doNotSelectColumn,
+
+      // afterChange: recordChanges,
+      // afterRender: updateDeets,
+
+      customBorders: [{
+        range: {
+          from: {
+            row: 0,
+            col: 0
+          },
+          to: {
+            row: data.length,
+            col: 1
+          }
+        },
+        right: {
+          width: 3,
+          color: 'black'
+        },
+      }]
+    }
+
+    var table = new Handsontable(document.getElementById('example'), configurations);
+
+    table.render();
+
+  </script>
+
+</body>
+</html>
