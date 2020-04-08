@@ -82,6 +82,11 @@ level_LUT = {"00":"00 - Datum","B1":"B1 - Lower Basement","L0":"L0 - Basement","
 sequence_LUT = {"00":"00 - Whole Site","00.":"00 - Whole Site","01":"01 - Building Zone A","02":"02 - Building Zone B","03":"03 - Building Zone C","04":"04 - Building Zone D","05":"05 - Building Zone E","06":"06 - Building Zone F","07":"07 - Building Zone G","08":"08 - Building Zone H","09":"09 - Building Zone I","11":"11 - Building Sector 1","12":"12 - Building Sector 2","13":"13 - Building Sector 3","14":"14 - Building Sector 4","15":"15 - Building Sector 5","16":"16 - Building Sector 6","17":"17 - Building Sector 7","18":"18 - Building Sector 8","19":"19 - Building Sector 9","20":"20 - Building Sector 10","21":"21 - Building Sector 11","22":"22 - Building Sector 12","23":"23 - Building Sector 13","24":"24 - Building Sector 14","25":"25 - Building Sector 15","26":"26 - Building Sector 16","27":"27 - Building Sector 17","28":"28 - Building Sector 18","29":"29 - Building Sector 19","30":"30 - Building Sector 20","31":"31 - Building Sector 21","32":"32 - Building Sector 22","33":"33 - Building Sector 23","34":"34 - Building Sector 24"}
 
 
+##LOOK UP TABLES
+##________________________________________________
+discipline_to_xx = {"Architectural":"AR"}
+originator_to_cox = {"COX Architects":"COX"}
+##________________________________________________
 
 ##ANDREW'S SCRIPT FOR MAKING DICTIONARIES IN DATAFIELDS
 class DataFieldFormField(forms.CharField):
@@ -137,7 +142,6 @@ def save( self, *args, **kw ):
 	self.checkGeneralTitle()
 	super( staff, self ).save( *args, **kw )
 
-
 # Create your models here.
 class Projects(models.Model):
 
@@ -145,6 +149,7 @@ class Projects(models.Model):
 	number = models.CharField(max_length=200, unique=True)
 	location = models.CharField(max_length=200,choices=location_choices)
 	namingConv = models.TextField(max_length=9999, default="[]")
+	namingLUTs = models.TextField(max_length=9999, default="[]")
 
 	class Meta:
 		ordering = ['number']
@@ -154,14 +159,6 @@ class Projects(models.Model):
 	    return str(self.number+" - "+self.name)
 
 class Drawings(models.Model):
-	# dn_project = models.CharField(max_length=200,blank=True,null=True)
-	# dn_originator = models.CharField(max_length=200,blank=True,null=True)
-	# dn_volume_system = models.CharField(max_length=200,blank=True,null=True)
-	# dn_type = models.CharField(max_length=200,blank=True,null=True)
-	# dn_discipline = models.CharField(max_length=200,blank=True,null=True)
-	# dn_series = models.CharField(max_length=200,blank=True,null=True)
-	# dn_level = models.CharField(max_length=200,blank=True,null=True)
-	# dn_zone_sequence = models.CharField(max_length=200,blank=True,null=True)
 	# drawing_title1 = models.CharField(max_length=200,default="Architectural Services")
 	# drawing_title2 = models.CharField(max_length=200)
 	# drawing_title3 = models.CharField(max_length=200,blank=True,null=True)
@@ -171,9 +168,7 @@ class Drawings(models.Model):
 	# scale = models.CharField(max_length=200,choices=scale_choices,default="100")
 	# paper = models.CharField(max_length=200,choices=paper_choices,default="A0")
 	# dwg_type = models.CharField(max_length=200,choices=type_choices,default="2D Drawing")
-	# discipline = models.CharField(max_length=200,default="Architectural")
 	# phase = models.CharField(max_length=200,choices=phase_choices,default="Design Development")
-	# originator = models.CharField(max_length=200,default="Cox Architects")
 
 	project = models.ForeignKey(Projects, on_delete=models.CASCADE,blank=True,null=True)
 	data_store = DataField()
@@ -189,7 +184,26 @@ class Drawings(models.Model):
 				dname.append(self.data_store.get(part))
 			else:
 				dname.append(part)
+
+			#USING THE LOOK UP TABLES
+		luts = self.project.namingLUTs
+		luts = ast.literal_eval(luts)
+		for t in luts:
+			LUT_dname = []
+			lutdict = eval(t)
+			for n in dname:
+				if n in lutdict:
+					new = lutdict.get(n)
+					LUT_dname.append(new)
+				else:
+					LUT_dname.append(n)
+			dname = LUT_dname
+
+			#TURNING THE ARRAY INTO A STRING
 		dname = "".join(dname)
+			#REMOVING THE ~ ... THIS MAY NOT BE REQUIRED ON ALL JOBS
+		dname = dname.replace("~","")
+
 		self.drawing_name = dname
 		self.save()
 		return dname
@@ -254,8 +268,10 @@ class Drawings(models.Model):
 	class Meta:
 		verbose_name_plural = "Drawings"
 	def __str__(self):
-	    return self.drawing_name
-
+		if self.drawing_name != "":
+			return self.drawing_name
+		else:
+			return ("placeholder" + "-" + str(self.pk))
 
 
 class Submissions(models.Model):

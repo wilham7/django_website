@@ -36,8 +36,10 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 def newView(request):
 	objs = Drawings.objects.all()
 	for d in objs:
+		d.originator = 'Cox Architects'
+		d.save()
 		d.drawingName()
-	return JsonResponse({"Test":"It worked!"})
+	return JsonResponse({"Status":"Drawing names updated"})
 
 def postAconex(request, sub_date):
 
@@ -358,19 +360,25 @@ def uploadDrawings(request):
 	log = []
 	values = []
 	if request.method == "POST":
-		data = request.POST["data"]
+		data = request.POST["big_data"]
 		jd = json.loads(data)
-		jd = jd[0]
+		createdcount = 0
+		updatecount = 0
+
 		pj = Projects.objects.get(number='218018.00')
-		try:
-			Drawings.objects.create(data_store=jd,project=pj)
-			print("Create worked?")
-			# values = str(Drawings.objects.values())
-		except Exception as e:
-			print(e)			
+
+		for d in jd:
+			data = d["data"]
+			# print(d)
+			try:
+				Drawings.objects.create(data_store=data,project=pj)
+				updatecount += 1
+				print("Create count:" + str(updatecount))
+			except Exception as e:
+				print(e)			
 
 
-		return JsonResponse({'test':'test'})
+		return JsonResponse({'Upload status':success})
 
 
 	# 	for drawing in jd:
@@ -445,10 +453,18 @@ def uploadSubmissions(request):
 							exist.req_drawings.add(dwg)
 					except Exception as e:
 						print(e)
+
+						
 				#Creating
 				except:
+					pj = Projects.objects.get(number='218018.00')
+
+
 					log.append("Object doesn't exist")
-					mod, created = Submissions.objects.update_or_create(sub_date=sub['sub_date'])
+
+					Submissions.objects.create(sub_date=sub['sub_date'], project=pj)
+					exist = get_object_or_404(Submissions, sub_date=sub['sub_date'])
+
 					rd = sub['req_drawings']
 					createdcount += 1
 

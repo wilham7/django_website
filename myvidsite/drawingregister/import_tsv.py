@@ -106,7 +106,7 @@ def makeDrawings2():
 
 		# print(all_data)
 
-		good_keys = ['NUMBER - Project','NUMBER - Originator','NUMBER - Volume OR System','NUMBER - Type','NUMBER - Discipline','NUMBER - Series','NUMBER - Level','NUMBER - Zone or Sequence','DRAWING TITLE - Title 1','DRAWING TITLE - Title 2 (Category)','DRAWING TITLE - Title 3','STUDIO RESPONSIBILITY','MODEL LOCATION','REVISION OFFSET','SCALE','PRINT','TYPE','DISCIPLINE','PHASE',]
+		good_keys = ['NUMBER - Project','NUMBER - Volume OR System','NUMBER - Type','NUMBER - Discipline','NUMBER - Series','NUMBER - Level','NUMBER - Zone or Sequence','DRAWING TITLE - Title 1','DRAWING TITLE - Title 2 (Category)','DRAWING TITLE - Title 3','STUDIO RESPONSIBILITY','MODEL LOCATION','REVISION OFFSET','SCALE','PRINT','TYPE','DISCIPLINE','PHASE','ORIGINATOR']
 
 		all_data_new = []
 
@@ -114,7 +114,7 @@ def makeDrawings2():
 			filtered = dict(zip(good_keys, [i[k] for k in good_keys]))
 			all_data_new.append(filtered)
 
-		lut = {"NUMBER - Project":"project","NUMBER - Originator":"originator","NUMBER - Volume OR System":"volume","NUMBER - Type":"type","NUMBER - Discipline":"discipline","NUMBER - Series":"series","NUMBER - Level":"level","NUMBER - Zone or Sequence":"zone","DRAWING TITLE - Title 1":"drawing_title1","DRAWING TITLE - Title 2 (Category)":"drawing_title2","DRAWING TITLE - Title 3":"drawing_title3","STUDIO RESPONSIBILITY":"studio","MODEL LOCATION":"model_location","REVISION OFFSET":"revision_offset","SCALE":"scale","PRINT":"paper","TYPE":"dwg_type","DISCIPLINE":"discipline","PHASE":"phase",}
+		lut = {"NUMBER - Project":"project","ORIGINATOR":"originator","NUMBER - Volume OR System":"volume","NUMBER - Type":"type","NUMBER - Discipline":"discipline","NUMBER - Series":"series","NUMBER - Level":"level","NUMBER - Zone or Sequence":"zone","DRAWING TITLE - Title 1":"drawing_title1","DRAWING TITLE - Title 2 (Category)":"drawing_title2","DRAWING TITLE - Title 3":"drawing_title3","STUDIO RESPONSIBILITY":"studio","MODEL LOCATION":"model_location","REVISION OFFSET":"revision_offset","SCALE":"scale","PRINT":"paper","TYPE":"dwg_type","DISCIPLINE":"discipline","PHASE":"phase",}
 		final_data = []
 
 
@@ -126,27 +126,35 @@ def makeDrawings2():
 				row_adn.update(adn)
 			final_data.append(row_adn)
 
-		print(final_data)
+		# print(final_data)
 		post_data = []
 
 		for d in final_data:
-			topost = {'data':json.dumps([d])
-			}
+			topost = {'data':d}
 			post_data.append(topost)
 
-
-		for d in post_data:
-			try:
-				# print(d)
-				r = requests.post(posturl, d)
-				drawing = r.json()
-
-				print(drawing)
-			except Exception as e:
-				print(e)
+		post_data = {'big_data':json.dumps(post_data)}
+		# print(post_data)
+		
 
 
-makeDrawings2()
+
+		try:
+			r = requests.post(posturl, post_data)
+		except Exception as e:
+			print(e)
+
+		# for d in post_data:
+		# 	try:
+		# 		# print(d)
+		# 		r = requests.post(posturl, d)
+		# 		drawing = r.json()
+
+		# 		print(drawing)
+		# 	except Exception as e:
+		# 		print(e)
+
+
 
 
 
@@ -248,6 +256,7 @@ def makeSubs():
 
 
 
+# makeDrawings2()
 
 # makeDrawings()
-# makeSubs()
+makeSubs()
