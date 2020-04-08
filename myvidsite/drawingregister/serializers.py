@@ -12,6 +12,9 @@ class DrawingSerializer(serializers.ModelSerializer):
 	# level = serializers.ReadOnlyField()
 	# sequence = serializers.ReadOnlyField()
 
+	#THIS CONVERTS THE STRINGIFIED DICTIONARY TO AN ACTUAL DICTIONARY
+	data_store = serializers.JSONField()
+
 	class Meta:
 		model = Drawings
 		fields = ('__all__')

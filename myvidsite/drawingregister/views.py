@@ -499,8 +499,7 @@ def drawingTable(request):
 
 	tableHeads = {"id":"ID"}
 
-	# allDwg = Drawings.objects.all()
-	allDwg = Drawings.objects.all()[:5]
+	allDwg = Drawings.objects.all()[:100]
 	for d in allDwg:
 		ddict = d.data_store
 		for k in ddict:
@@ -509,11 +508,37 @@ def drawingTable(request):
 			else:
 				tableHeads["data_store."+k] = (str(k).capitalize()).replace("_"," ") 
 
+	# Get regular fields
+	baseTableHeads = {}
+	fields = [f.get_attname() for f in Drawings._meta.fields]
+	for f in fields:
+		if f != 'data_store':
+			baseTableHeads[f] = (str(f).capitalize()).replace("_"," ") 
+
+	starts_with = ["id","drawing_name"]
+
+	all_params = tableHeads
+	all_params.update(baseTableHeads)
+
+	start_params = {}
+	end_params = {}
+
+	for i in all_params:
+		if i in starts_with:
+			start_params[i] = all_params[i]
+		else:
+			end_params[i] = all_params[i]
+
+	params = sorted(end_params.items(), key=lambda item: item[1].lower())
+
+	final_params = {}
+	final_params.update(start_params)
+	final_params.update(end_params)
 
 
 	allDrawings = DrawingSerializer(allDwg, many=True).data
 	context = {
-	"params":tableHeads,"data":json.dumps(allDrawings)
+	"params":final_params,"data":json.dumps(allDrawings)
 	}
 
 	return render(request,"drawingregister/drawing_table.html",context)

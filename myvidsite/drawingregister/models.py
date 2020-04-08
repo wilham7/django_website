@@ -134,6 +134,7 @@ class DataField(models.TextField):
         defaults = {'form_class': DataFieldFormField}
         defaults.update(kwargs)
         return super().formfield(**defaults)
+        
 class parentModel(models.Model):
     data = DataField()
 

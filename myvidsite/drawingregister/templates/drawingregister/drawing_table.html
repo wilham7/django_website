@@ -70,12 +70,21 @@
     var localStorage_columnsOrder = "rm_last_columns_order"
     var localStorage_idOrder = "rm_last_columns_id_order"
 
-    // var base_renderer = myRenderer
+    function myIDRenderer(instance, td, row, col, prop, value, cellProperties) {
+        td.innerHTML = value;
+        td.id = data[cellProperties["row"]]["id"];
+        return td
+    }
 
-    // var renderer_lut = {
-    //  "element_id": {
-    //    "readOnly": true
-    //  },
+    var base_renderer = myIDRenderer
+
+    var renderer_lut = {
+     "element_id": {
+       "readOnly": true
+     }
+    }
+
+    
     //  "room_type_name": {
     //    "type": "autocomplete",
     //    "source": data_rt,
@@ -110,13 +119,14 @@
   </script>
 
   <!-- REFERENCE SCRIPTS HERE TBC -->
-
   <!--  -->
+  {% include "drawingregister/includes/func_makeColumns.html" %}
 
   <script type="text/javascript">
 
     var columns = [
       {data:'id', readOnly: true, observeChanges: true},
+      {data:'drawing_name', readOnly: true, observeChanges: true},
       {data:'data_store.level'},
       {data:'data_store.phase'},
       {data:'data_store.paper'},
@@ -132,7 +142,7 @@
 
       data: data,
 
-      columns: columns,
+      columns: make_columns(data_lut, renderer_lut, myIDRenderer),
       // columns: columns_setup,
       colHeaders: cHeaders,
 

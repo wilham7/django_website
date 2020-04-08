@@ -1,0 +1,203 @@
+<script type="text/javascript">
+
+	// var renderer_lut = {
+	// 	"element_id": {
+	// 		"readOnly": true
+	// 	},
+	// 	"room_type_name": {
+	// 		"type": "autocomplete",
+	// 		"source": data_rt,
+	// 		"renderer": roomTypeRenderer
+	// 	},
+	// 	"data.Area": {
+	// 		"type": "numeric",
+	// 		"renderer": areaRenderer
+	// 	},
+	// 	"data.Unbounded+Height" :{
+	// 		"type": "numeric",
+	// 		"renderer": areaRenderer	
+	// 	},
+	// 	"data.isGFA": {
+	// 		"renderer": booleanRenderer
+	// 	}
+	// }
+
+	/* Documentation
+
+		Converts human readable column headers into custom data headers
+
+		data_lut = {"element_id": "Element ID", "data.Level": "Level"}
+
+		renderer_lut = {
+			"element_id": {
+				"readOnly": true
+			},
+			"room_type_name": {
+				"type": "autocomplete",
+				"source": data_rt,
+				"renderer": roomTypeRenderer
+			},
+			"data.Area": {
+				"type": "numeric",
+				"renderer": areaRenderer
+			},
+			"data.isGFA": {
+				"renderer": booleanRenderer
+			}
+		}
+
+		default_renderer = handsontable renderer object. i.e. myRenderer
+
+		custom_order [optional] = list of column headers to define order i.e. ["Element ID", "Level", "Area"]
+
+	*/
+
+	function capitalizeFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	function trimRight(string){
+		return string.toString().replace(/\s+$/,'');
+	}
+
+	function removeItem(array, item) {
+		var i = array.length;
+		
+		while (i--) {
+			if (array[i] === item) {
+				array.splice(array.indexOf(item), 1);
+			}
+		}
+	}
+
+	function reorder(orderArray, elementContainer){
+		$.each(orderArray, function(key, val){
+			console.log(key + ": " + val)
+			elementContainer.append($("#"+val));
+		});
+	}
+
+	function reorder_handles(orderHeaderArray, elementContainer){
+		var original_header_order = []
+		$.each( data_lut, function( key, value ) {
+			original_header_order.push(value);
+		});
+
+		var actual_header_order = []
+		for (var header in orderHeaderArray) {
+			actual_header_order.push(original_header_order.indexOf(orderHeaderArray[header]))
+		}
+
+		$.each(actual_header_order, function(key, val){
+			elementContainer.append($("#"+val));
+		});
+	}
+
+	function get_column_order(table, data_lut) {
+
+		var rev_lut = {}
+
+		var colHeadersArray = table.getSettings().colHeaders;
+
+		console.log(colHeadersArray)
+
+		var rev_LUT = createRevDict(data_lut, rev_lut)
+
+		console.log(rev_LUT)
+		
+		var column_order = []
+
+		for (var header in colHeadersArray) {
+			console.log(colHeadersArray)
+			console.log(colHeadersArray[header])
+			var test = rev_LUT[colHeadersArray[header]]
+			console.log(test)
+			column_order.push(test)
+		}
+
+		console.log(column_order)
+
+		return column_order
+	}
+
+	function get_column_id_order() {
+
+		console.log(column_order)
+
+		var listElement = $('#listWithHandle').children()
+
+		get_col_order = []
+		console.log(column_order)
+
+		for (var x = 0; x < listElement.length; x++) {
+
+			get_col_order.push(listElement[x].id)
+		}
+
+		console.log(column_order)
+		console.log(get_column_order)
+		return get_col_order
+
+	}
+
+	function createRevDict(d_lut) {
+		var new_dict = {}
+		
+		$.each( d_lut, function(k,v) {
+			new_dict[v] = k
+		})
+
+		return new_dict
+	}
+
+	var make_columns = function(data_lut, renderer_lut, default_renderer, custom_order) {
+
+		console.log(data_lut)
+
+		var rev_LUT = createRevDict(data_lut)
+
+		console.log(rev_LUT)
+
+		if (custom_order) {
+			var keys = custom_order
+
+			cHeaders = []
+			var d_lut_keys = []
+
+			for (var key in keys) {
+				var new_key = rev_LUT[keys[key]]
+				if (new_key) {
+					cHeaders.push(keys[key])
+					d_lut_keys.push(new_key)
+				}
+			}
+
+		} else {
+			var d_lut_keys = Object.keys(data_lut)
+		}
+
+		var cols = []
+
+		for ( var k = 0; k < d_lut_keys.length; k ++ ){
+			
+			var d_lut_key = d_lut_keys[k]
+			var obj = {}
+
+			if (Object.keys(renderer_lut).indexOf(d_lut_key) != -1) {
+				try {obj["data"] = d_lut_key} catch(e) {console.log(e)}
+				try {obj["renderer"] = renderer_lut[d_lut_key]["renderer"]} catch(e) {console.log(e)}
+				try {obj["source"] = renderer_lut[d_lut_key]["source"]} catch(e) {console.log(e)}
+				try {obj["type"] = renderer_lut[d_lut_key]["type"]} catch(e) {console.log(e)}
+				try {obj["readOnly"] = renderer_lut[d_lut_key]["readOnly"]} catch(e) {console.log(e)}
+			} else {
+				obj["data"] = d_lut_key
+				obj["renderer"] = default_renderer
+			}
+
+			obj["allowInvalid"] = false;
+
+			cols.push(obj)
+		}
+		return cols
+	}
+</script>
