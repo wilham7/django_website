@@ -1,0 +1,159 @@
+<script type="text/javascript">
+	
+	var recordChanges = function(modifications, actions) {
+		console.log("READY TO RECORD CHANGES")
+
+		// When you make an edit
+		if (actions != 'loadData') {
+
+			var payload = {data:[]}
+
+			for ( var i = 0; i < modifications.length; i ++ ) {
+
+				var apob = {}
+
+				var editheaders = table.getSettings().colHeaders;
+
+				var dataHead = modifications[i][1]
+
+				console.log(data_lut)
+				console.log(dataHead)
+
+				var dataValue = modifications[i][3]
+
+				if (dataValue == null) {
+					dataValue = ""
+				}
+
+				var actualhead = data_lut[dataHead]
+
+				console.log(actualhead)
+
+				// If its an editable column and room type column exists
+				if (do_not_edit.indexOf(actualhead) == -1) {
+
+					var col = editheaders.indexOf(actualhead)
+
+					var row = modifications[i][0];
+
+					try {
+
+						var continue_run = true
+
+						try {
+							var val_id = this.getCell(row,col).id;
+							var found = true
+						} catch(e) {
+							var found = false
+						}
+
+						if (found) {
+							apob[unique_identifier_dataHeader] = val_id
+
+							if (base_headers.indexOf(dataHead) == -1) {
+								header = dataHead.split(".")[0]
+								footer = dataHead.split(".")[1]
+
+								// try {
+								// 	footer = actualhead.split("+").join(" ")
+								// } catch(e) {
+								// 	console.log(e)
+								// }
+								
+								console.log(footer)
+
+								apob[header] = {}
+								apob[header][footer] = ""
+
+								apob[header][footer] = dataValue
+
+								var is_dataParam = true
+							} else {
+								apob[dataHead] = dataValue
+								var is_dataParam = false
+							}
+
+							console.log("CHANGE")
+							console.log(apob)
+
+							try {
+
+								var arr = payload["data"]
+
+								var elid_arr = []
+
+								if (arr != []) {
+									for (var rm in arr) {
+										var elid = arr[rm][unique_identifier_dataHeader]
+										elid_arr.push(elid)
+									}
+								}
+
+								if (elid_arr != []) {
+									var index = elid_arr.indexOf(apob[unique_identifier_dataHeader])
+									if (index != -1) {
+										if (is_dataParam == true) {
+											arr[index][header][footer] = dataValue
+										} else {
+											arr[index][dataHead] = dataValue
+										}
+									} else {
+										arr.push(apob)
+									}
+								}
+							} catch(e) {
+								console.log(e)
+							}
+						}
+
+						console.log(payload)
+						
+						// payload["data"].push(apob);
+
+					} catch(e) {
+						var continue_run = false
+						console.log(e)
+						console.log("DONE")
+					}
+
+				} else {
+
+					// Cannot edit a non-editable column and room type column must exist
+					console.log("Cannot edit: " + dataHead)
+
+				}
+
+			}
+
+
+			if (continue_run == true) {
+				console.log("PAYLOAD")
+				console.log(payload)
+
+				setTimeout(function(){
+					$.ajax({
+						url: posturl,
+						data: {data: JSON.stringify(payload)},
+						dataType: 'json',
+						method: 'POST',
+						success: function(response) {
+							console.log("RESPONSE")
+							console.log(response)
+							if (response["updatedData"] != []){
+								setDrawingName(response["updatedData"])
+							}
+
+						},
+						failure: function(response) {
+							console.log(response)
+						}
+					})
+				},200)
+			}
+			
+
+		}
+
+	}
+
+</script>

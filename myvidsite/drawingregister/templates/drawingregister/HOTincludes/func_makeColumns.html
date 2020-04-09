@@ -1,57 +1,5 @@
 <script type="text/javascript">
 
-	// var renderer_lut = {
-	// 	"element_id": {
-	// 		"readOnly": true
-	// 	},
-	// 	"room_type_name": {
-	// 		"type": "autocomplete",
-	// 		"source": data_rt,
-	// 		"renderer": roomTypeRenderer
-	// 	},
-	// 	"data.Area": {
-	// 		"type": "numeric",
-	// 		"renderer": areaRenderer
-	// 	},
-	// 	"data.Unbounded+Height" :{
-	// 		"type": "numeric",
-	// 		"renderer": areaRenderer	
-	// 	},
-	// 	"data.isGFA": {
-	// 		"renderer": booleanRenderer
-	// 	}
-	// }
-
-	/* Documentation
-
-		Converts human readable column headers into custom data headers
-
-		data_lut = {"element_id": "Element ID", "data.Level": "Level"}
-
-		renderer_lut = {
-			"element_id": {
-				"readOnly": true
-			},
-			"room_type_name": {
-				"type": "autocomplete",
-				"source": data_rt,
-				"renderer": roomTypeRenderer
-			},
-			"data.Area": {
-				"type": "numeric",
-				"renderer": areaRenderer
-			},
-			"data.isGFA": {
-				"renderer": booleanRenderer
-			}
-		}
-
-		default_renderer = handsontable renderer object. i.e. myRenderer
-
-		custom_order [optional] = list of column headers to define order i.e. ["Element ID", "Level", "Area"]
-
-	*/
-
 	function capitalizeFirstLetter(string) {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	}
@@ -179,8 +127,11 @@
 		var cols = []
 
 		for ( var k = 0; k < d_lut_keys.length; k ++ ){
+
+
 			
 			var d_lut_key = d_lut_keys[k]
+
 			var obj = {}
 
 			if (Object.keys(renderer_lut).indexOf(d_lut_key) != -1) {
@@ -197,6 +148,7 @@
 			obj["allowInvalid"] = false;
 
 			cols.push(obj)
+			
 		}
 		return cols
 	}

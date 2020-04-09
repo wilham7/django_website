@@ -1,0 +1,28 @@
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		console.log("READY")
+
+		var rev_LUT = createRevDict(data_lut)
+
+		for (var p in data_lut){
+			prep = p.replace("data_store.","")
+			if (data_filt_params.indexOf(prep) == -1) {
+				favourite.push(p)
+			}
+			else if (data_filt_params.indexOf(prep) == -1) {
+				favourite.push(p)
+			}
+			else {
+				//pass
+			}
+		}
+
+		// Favourites to be HIDDEN
+		hideAndSeek(favourite, data_lut)
+
+		// showAndDismissAlert('success', 'Spreadsheet Loaded!');
+
+	})
+	
+</script>

@@ -41,13 +41,13 @@
 
   <script type="text/javascript">
 
-    var data = {{data|safe}} // Drawing data_store
+    var data = {{data|safe}} // Is an array of all Drawings objects
 
-    var data_lut = {{params|safe}} // Parameter dictionary {"project": "Project", "model_location", "Model Location"}
-
-    // var data_filt_params = {{context.params_filter|safe}}
+    var data_lut = {{params|safe}} // Column header dictionary {"project": "Project", "model_location", "Model Location"}
 
     var columns_setup = []
+    
+    var data_filt_params = {{params_filter|safe}}
 
     dbHeaders = []
     cHeaders = []
@@ -64,7 +64,7 @@
     // ------------------ PREDEFINE PER EACH USE ------------------
 
     // Parameters to always be selected, but can be unselected after
-    var param_always_show = ["element_id", "room_name"]
+    var params_always_show = ["element_id", "room_name"]
 
     var localStorage_toShow = "rm_last_columns_toshow"
     var localStorage_columnsOrder = "rm_last_columns_order"
@@ -79,61 +79,41 @@
     var base_renderer = myIDRenderer
 
     var renderer_lut = {
-     "element_id": {
+     "drawing_name": {
        "readOnly": true
-     }
+     },
     }
 
-    
+    // EXAMPLE LEFT BY EMILY
     //  "room_type_name": {
     //    "type": "autocomplete",
     //    "source": data_rt,
     //    "renderer": roomTypeRenderer
-    //  },
-    //  "data.Area": {
-    //    "type": "numeric",
-    //    "renderer": areaRenderer
-    //  },
-    //  "data.Unbounded+Height" :{
-    //    "type": "numeric",
-    //    "renderer": areaRenderer  
-    //  },
-    //  "data.isGFA": {
-    //    "renderer": booleanRenderer
-    //  }
-    // }
 
     // Record Changes Variables
 
     // Make sure you don't override any of these column values
-    // var do_not_edit = ["Element ID", "Source File", "Number"]
+    var do_not_edit = []
 
     // Headers that aren't in the data field
-    // var base_headers = ["element_id", "room_name", "room_type_name", "source_file"]
+    var base_headers = Object.keys({{base_params|safe}})
 
-    // var unique_identifier_colHeader = "ID"
-    // var unique_identifier_dataHeader = "id"
+    var unique_identifier_colHeader = "Id"
+    var unique_identifier_dataHeader = "id"
 
-    // var posturl = '/bd/capi/updateRooms/'
+    var posturl = '/dregister/updateDrawings/'
 
   </script>
 
-  <!-- REFERENCE SCRIPTS HERE TBC -->
-  <!--  -->
-  {% include "drawingregister/includes/func_makeColumns.html" %}
+  <!-- REFERENCE SCRIPTS HERE -->
+  {% include "drawingregister/HOTincludes/func_makeColumns.html" %}
+  {% include "drawingregister/HOTincludes/func_hideAndSeek.html" %}
+  {% include "drawingregister/HOTincludes/func_recordChanges.html" %}
+  {% include "drawingregister/HOTincludes/func_updateRows.html" %}
+  {% include "drawingregister/HOTincludes/func_setDrawingName.html" %}
+  {% include "drawingregister/HOTincludes/onReady.html" %}
 
   <script type="text/javascript">
-
-    var columns = [
-      {data:'id', readOnly: true, observeChanges: true},
-      {data:'drawing_name', readOnly: true, observeChanges: true},
-      {data:'data_store.level'},
-      {data:'data_store.phase'},
-      {data:'data_store.paper'},
-      {data:'data_store.series'},
-      {data:'data_store.volume'},
-      {data:'data_store.type'},
-    ]
 
     // CONFIGURATIONS
 
@@ -149,14 +129,17 @@
       // maxRows: 10,
 
       autoColumnSize: true,
+      // colWidths: [150,100,150,100],
+
       fixedColumnsLeft: 2,
       hiddenColumns: {
-        indicators: true,
+        indicators: false,
         copyPasteEnabled: false
       },
 
       manualColumnMove: true,
       manualColumnResize: true,
+
 
       // contextMenu: ['filter_by_condition', 'filter_operators', 'filter_by_condition2', 'filter_by_value', 'filter_action_bar'],
       // dropdownMenu: true,
@@ -171,7 +154,7 @@
       currentColClassName: 'currentCol',
       selectionMode: 'multiple',
       
-      renderAllRows: true,
+      renderAllRows: false,
       multiColumnSorting: true,
       sortIndicator: true,
       persistentState: true,
@@ -180,7 +163,7 @@
       // afterGetColHeader: addInput,
       // beforeOnCellMouseDown: doNotSelectColumn,
 
-      // afterChange: recordChanges,
+      afterChange: recordChanges,
       // afterRender: updateDeets,
 
       customBorders: [{

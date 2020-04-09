@@ -1,0 +1,46 @@
+<script type="text/javascript">
+
+	function updateRows(rowData) {
+
+		var editheaders = table.getSettings().colHeaders;
+
+		console.log(editheaders)
+
+		var elid_col = editheaders.indexOf(unique_identifier_colHeader)
+
+		var col_vals = table.getDataAtCol(elid_col)
+
+		var elids = []
+		
+		for ( var row = 0; row < col_vals.length; row ++ ) {
+			elids.push(col_vals[row])
+		}
+
+		try {
+			for ( var rm = 0; rm < rowData.length; rm ++ ) {
+
+				var row = elids.indexOf(rowData[rm][unique_identifier_dataHeader])
+				var rm_keys = Object.keys(rowData[rm])
+
+				console.log(rm_keys)
+
+				for ( var rm_key = 0; rm_key < rm_keys.length; rm_key ++ ) {
+					if (rm_keys[rm_key] != unique_identifier_dataHeader) {
+						if (editheaders.indexOf(rm_keys[rm_key]) != -1) {
+							var col = editheaders.indexOf(rm_keys[rm_key])
+							var val = rowData[rm][rm_keys[rm_key]]
+							
+							console.log("KEY: " + rm_keys[rm_key] + "\n" + "row:" + row + "\n" + "col:" + col + "\n" + "val:" + val)
+							
+							table.setDataAtCell(row, col, val, 'loadData')
+						}
+					}
+				}
+
+			}
+		} catch(e) {
+			console.log(e)
+		}
+	}
+
+</script>

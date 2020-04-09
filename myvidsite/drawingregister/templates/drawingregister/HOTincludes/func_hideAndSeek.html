@@ -1,0 +1,53 @@
+<script type="text/javascript">
+
+	var hideAndSeek = function(show_columns, data_lut) {
+
+		console.log(show_columns)
+
+		try {
+
+			const hiddenColumnsPlugin = table.getPlugin('hiddenColumns');
+			
+			var editheaders = table.getSettings().colHeaders;
+
+			console.log(editheaders)
+
+			var remove = []
+			var search = []
+
+			for ( var x = 0; x < editheaders.length; x ++ ) {
+				remove.push(x)
+			}
+
+			for ( var i = 0; i < show_columns.length; i ++ ) {
+				var search_k = show_columns[i]
+				var actualhead = data_lut[search_k]
+				var col = editheaders.indexOf(actualhead)
+				search.push(col)
+			}
+
+			if (search.indexOf(-1) != -1) {
+				console.log(search)
+				removeItem(search, -1);
+				console.log(search)
+			}
+
+			var seek = search
+			let hide = remove.filter(x => !seek.includes(x));
+
+			console.log("HIDE AND SEEK")
+			console.log(seek)
+			console.log(remove)
+			console.log(hide)
+
+			hiddenColumnsPlugin.hideColumns(hide);
+			hiddenColumnsPlugin.showColumns(seek);
+
+			table.render()
+			
+		} catch(e) {
+			console.log(e)
+		}
+	}
+
+</script>

@@ -293,74 +293,47 @@ def submissions(request, pj_slug):
 
 @csrf_exempt
 # @csrf_protect
-
 def updateDrawings(request):
 
-	# data = '[{"id":"20", "dn_series":"11"},{"id":"21", "dn_series":"11"}]'
 
-	log = []
-	dn_to_return = []
+	data_to_return = [] 
 
 
 	if request.method == "POST":
+		data = request.POST['data']
+		data = ast.literal_eval(data)
+		data = data.get("data")
 
-		try:
-			createdcount = 0
-			updatecount = 0
-			
-			# data = request.POST["data"]
-			data = request.POST.get('data','')	
 
-				# CHECK WHAT KEY AND VALUE IS COMING THROUGH
-			# for key, value in request.POST.items():
-			# 	print('Key: %s' % (key) ) 
-			# 	print('Value %s' % (value) )
+		for obj in data:
+			dwg = Drawings.objects.get(pk=obj.get("id"))
+			old_data = dwg.data_store
+			new_data = obj.get("data_store")
+			combined_data = {}
+			combined_data.update(old_data)
+			try:
+				combined_data.update(new_data)
+			except Exception as e:
+				print(e)
 
-				#EXPLODE OUTER LAYER OF DICT
-			jd = json.loads(data)
-			jd = jd['data']
+			if combined_data == old_data:
+				pass
+				print("No changes to update")
+			else:
+				dwg.data_store = combined_data
+				dwg.drawingName()
+				dwg.save()
+				print("A Drawing was updated!")
+				print(dwg.drawing_name)
 
-			log.append(jd)
+				data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
+				data_to_return.append(data_dict)
 
-			for drawing in jd:
+				print(data_to_return)
 
-				try:
-					exist = get_object_or_404(Drawings, id=drawing['id'])
 
-					try:
-						mod, created = Drawings.objects.update_or_create(id=drawing['id'], defaults=drawing)
-						print("mod")
-						print(mod)
+	return JsonResponse({"updatedData":data_to_return})
 
-						try:
-							# updated = get_object_or_404(Drawings, id=drawing['id'])
-							new = mod.drawing_name
-							dn_to_return.append(new)
-						except Exception as e:
-							print(e)
-								
-
-						if created:
-							createdcount += 1
-						else:
-							updatecount += 1
-					except:
-						log.append("update_or_create failed")
-
-				except:
-					log.append("Object doesn't exist")	
-
-			print('A post')
-			print(dn_to_return)
-			return JsonResponse({'returns':dn_to_return})
-
-		except:
-			return JsonResponse({'Empty data?':''})
-
-	else:
-
-		print('Not a post')
-		return JsonResponse({'test':"doesn't work"})
 
 @csrf_exempt
 def uploadDrawings(request):
@@ -497,7 +470,7 @@ def uploadSubmissions(request):
 def drawingTable(request):
 	import json
 
-	tableHeads = {"id":"ID"}
+	tableHeads = {}
 
 	allDwg = Drawings.objects.all()[:100]
 	for d in allDwg:
@@ -516,6 +489,7 @@ def drawingTable(request):
 			baseTableHeads[f] = (str(f).capitalize()).replace("_"," ") 
 
 	starts_with = ["id","drawing_name"]
+	params_filter = ["project_id"]
 
 	all_params = tableHeads
 	all_params.update(baseTableHeads)
@@ -538,7 +512,7 @@ def drawingTable(request):
 
 	allDrawings = DrawingSerializer(allDwg, many=True).data
 	context = {
-	"params":final_params,"data":json.dumps(allDrawings)
+	"params":final_params,"base_params":baseTableHeads,"params_filter":params_filter,"data":json.dumps(allDrawings)
 	}
 
 	return render(request,"drawingregister/drawing_table.html",context)
