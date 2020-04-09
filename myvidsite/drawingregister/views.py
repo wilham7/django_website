@@ -315,7 +315,6 @@ def updateDrawings(request):
 				combined_data.update(new_data)
 			except Exception as e:
 				print(e)
-
 			if combined_data == old_data:
 				pass
 				print("No changes to update")
