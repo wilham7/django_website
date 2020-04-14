@@ -304,33 +304,31 @@ def updateDrawings(request):
 		data = ast.literal_eval(data)
 		data = data.get("data")
 
+		try:
+			for obj in data:
+				dwg = Drawings.objects.get(pk=obj.get("id"))
+				old_data = dwg.data_store
+				new_data = obj.get("data_store")
+				combined_data = {}
+				combined_data.update(old_data)
+				try:
+					combined_data.update(new_data)
+				except Exception as e:
+					print(e)
+				if combined_data == old_data:
+					pass
+					print("No changes to update")
+				else:
+					dwg.data_store = combined_data
+					dwg.drawingName()
+					dwg.save()
+					print("A Drawing was updated!")
+					print(dwg.drawing_name)
 
-		for obj in data:
-			dwg = Drawings.objects.get(pk=obj.get("id"))
-			old_data = dwg.data_store
-			new_data = obj.get("data_store")
-			combined_data = {}
-			combined_data.update(old_data)
-			try:
-				combined_data.update(new_data)
-			except Exception as e:
-				print(e)
-			if combined_data == old_data:
-				pass
-				print("No changes to update")
-			else:
-				dwg.data_store = combined_data
-				dwg.drawingName()
-				dwg.save()
-				print("A Drawing was updated!")
-				print(dwg.drawing_name)
-
-				data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
-				data_to_return.append(data_dict)
-
-				print(data_to_return)
-
-
+					data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
+					data_to_return.append(data_dict)
+		except:
+			pass
 	return JsonResponse({"updatedData":data_to_return})
 
 
