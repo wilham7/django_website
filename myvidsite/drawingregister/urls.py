@@ -32,8 +32,8 @@ urlpatterns = [
     path("<pj_slug>/submissions/", views.submissions, name="submissions"),
     path("submissions/<str:single_slug>/", views.single_submission, name="single_submission"),
     path("submissions/open_file_path/<str:file_path>/", views.open_file_path, name="open_file_path"),
-    
-    path("<pj_slug>/drawingTable/", views.drawingTable, name="drawingTable"), 
+
+    path("<pj_slug>/drawingTable/<page_slug>", views.drawingTable, name="drawingTable"), 
     path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 
     path("latest_dwg/", views.latest_dwg, name="latest_dwg"),

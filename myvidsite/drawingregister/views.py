@@ -9,6 +9,7 @@ from .serializers import *
 from .forms import *
 
 import datetime
+import math
 import ast
 import json
 
@@ -424,13 +425,27 @@ def uploadSubmissions(request):
 	else:
 		return JsonResponse({'Error':'ONLY POST REQUESTS'})
 
-def drawingTable(request, pj_slug):
-	import json
-
+def drawingTable(request, pj_slug, page_slug):
 	tableHeads = {}
 
-	allDwg = Drawings.objects.filter(project__number = pj_slug)[:100]
-	for d in allDwg:
+	pj = Projects.objects.get(number=pj_slug)
+	colouredCols = pj.namingConv
+	print(colouredCols)
+
+	blockSize = 100
+	allDwg = Drawings.objects.filter(project__number = pj_slug)
+	count = allDwg.count()
+	chunks = [allDwg[x:x+blockSize] for x in range(0, count, blockSize)]
+	nav_tab_count = []
+	cx = 1
+	for c in chunks:
+		nav_tab_count.append(cx)
+		cx = cx+1
+
+	realPage = int(page_slug)-1
+	pagedDwg = chunks[realPage]
+
+	for d in pagedDwg:
 		ddict = d.data_store
 		for k in ddict:
 			if k in tableHeads:
@@ -459,17 +474,24 @@ def drawingTable(request, pj_slug):
 			start_params[i] = all_params[i]
 		else:
 			end_params[i] = all_params[i]
-
-	params = sorted(end_params.items(), key=lambda item: item[1].lower())
+	# ALPHABETICAL SORTING
+	# end_params = sorted(end_params.items(), key=lambda item: item[1].lower())
 
 	final_params = {}
 	final_params.update(start_params)
 	final_params.update(end_params)
 
 
-	allDrawings = DrawingSerializer(allDwg, many=True).data
+	allDrawings = DrawingSerializer(pagedDwg, many=True).data
 	context = {
-	"params":final_params,"base_params":baseTableHeads,"params_filter":params_filter,"data":json.dumps(allDrawings)
+	"params":final_params,
+	"base_params":baseTableHeads,
+	"params_filter":params_filter,
+	"data":json.dumps(allDrawings),
+	"nav_current_tab":int(page_slug),
+	"nav_tab_count":nav_tab_count,
+	"pj_slug":pj_slug,
+	"colouredCols":colouredCols,
 	}
 
 	return render(request,"drawingregister/drawing_table.html",context)

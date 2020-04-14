@@ -1,7 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title></title>
+{% include "drawingregister/header.html" %}
+
+  <style>
+          #example{
+          height: 80vh;
+          overflow: hidden;
+          width: 100%;
+      }
+
+     .footer {
+        position: fixed;
+        width: 100%;
+      }
+
+      .container{
+        width: 100vh !important;
+      }
+
+      .handsontable td.namingCell{
+        background-color: #dcedc8;
+      }
+
+  </style>
+
+
+
+  <title>Drawing table</title>
 
   <!-- AJAX -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -20,6 +45,10 @@
   <!-- Bootstrap -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  
+  <!-- Materialize -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
@@ -30,7 +59,7 @@
 
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
-</head>
+
 <body>
   
   <div style="padding-top: 10px;">
@@ -44,6 +73,8 @@
     var data = {{data|safe}} // Is an array of all Drawings objects
 
     var data_lut = {{params|safe}} // Column header dictionary {"project": "Project", "model_location", "Model Location"}
+
+    var colCols = {{colouredCols|safe}}
 
     var columns_setup = []
     
@@ -76,6 +107,13 @@
         return td
     }
 
+    function namingRenderer(instance, td, row, col, prop, value, cellProperties) {
+        td.innerHTML = value;
+        td.id = data[cellProperties["row"]]["id"];
+        td.className = "namingCell"
+        return td
+    }
+
     var base_renderer = myIDRenderer
 
     var renderer_lut = {
@@ -103,6 +141,11 @@
 
     var posturl = '/dregister/updateDrawings/'
 
+    window.onload = function () {
+    var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.navigationStart; 
+    console.log('Page load time is '+ loadTime);
+}
+
   </script>
 
   <!-- REFERENCE SCRIPTS HERE -->
@@ -111,9 +154,12 @@
   {% include "drawingregister/HOTincludes/func_recordChanges.html" %}
   {% include "drawingregister/HOTincludes/func_updateRows.html" %}
   {% include "drawingregister/HOTincludes/func_setDrawingName.html" %}
+  {% include "drawingregister/HOTincludes/func_colourCell.html" %}
   {% include "drawingregister/HOTincludes/onReady.html" %}
 
   <script type="text/javascript">
+
+    renderer_lut = colourCell(colCols, renderer_lut)
 
     // CONFIGURATIONS
 
@@ -190,5 +236,18 @@
 
   </script>
 
+  <div class="footer">
+    <ul class="pagination">
+      {% for nav in nav_tab_count %}
+        {% if nav == nav_current_tab  %}
+          <li class="active"><a href="#">{{ nav }}</a></li>
+        {% else %}
+          <li class="waves-effect" style="color: red"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=nav %}">{{ nav }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
+
 </body>
+
 </html>

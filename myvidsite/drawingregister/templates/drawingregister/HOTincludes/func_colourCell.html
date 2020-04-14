@@ -1,0 +1,25 @@
+<script type="text/javascript">
+
+	function colourCell(naming_headers, renderer_lut) {
+		console.log(naming_headers)
+		console.log(Object.keys(data_lut))
+		
+		for (var i = 0; i < naming_headers.length; i ++ ) {
+			if (Object.keys(data_lut).indexOf("data_store."+naming_headers[i]) != -1) {
+				renderer_lut["data_store."+naming_headers[i]] = {}
+				renderer_lut["data_store."+naming_headers[i]] = {"renderer":namingRenderer}
+				console.log("MATHCING HEADER")
+			}
+			else {
+				console.log("NO MATCH")
+			}
+		}
+
+		return renderer_lut
+
+
+	}
+
+
+
+</script>
