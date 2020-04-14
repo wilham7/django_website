@@ -32,6 +32,9 @@ urlpatterns = [
     path("<pj_slug>/submissions/", views.submissions, name="submissions"),
     path("submissions/<str:single_slug>/", views.single_submission, name="single_submission"),
     path("submissions/open_file_path/<str:file_path>/", views.open_file_path, name="open_file_path"),
+    
+    path("<pj_slug>/drawingTable/", views.drawingTable, name="drawingTable"), 
+    path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 
     path("latest_dwg/", views.latest_dwg, name="latest_dwg"),
     path("latest_sub/", views.latest_sub, name="latest_sub"),
@@ -43,9 +46,7 @@ urlpatterns = [
 
     path("postAconex/<str:sub_date>/", views.postAconex, name="postAconex"),
     path("uploadDrawings/", views.uploadDrawings, name="uploadDrawings"),
-    path("updateDrawings/", views.updateDrawings, name="updateDrawings"),
 	path("uploadSubmissions/", views.uploadSubmissions, name="uploadSubmissions"),
-    path("drawingTable/", views.drawingTable, name="drawingTable"), 
 
 
     path("newView/", views.newView, name="newView"),

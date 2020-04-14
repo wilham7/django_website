@@ -47,9 +47,6 @@ def dictTest(request):
 	return JsonResponse({"test":dwgdict})
 
 
-
-
-
 def postAconex(request, sub_date):
 
 	sub = Submissions.objects.get(sub_date=sub_date)
@@ -294,17 +291,15 @@ def submissions(request, pj_slug):
 @csrf_exempt
 # @csrf_protect
 def updateDrawings(request):
+	try:
+		data_to_return = [] 
 
 
-	data_to_return = [] 
+		if request.method == "POST":
+			data = request.POST['data']
+			data = ast.literal_eval(data)
+			data = data.get("data")
 
-
-	if request.method == "POST":
-		data = request.POST['data']
-		data = ast.literal_eval(data)
-		data = data.get("data")
-
-		try:
 			for obj in data:
 				dwg = Drawings.objects.get(pk=obj.get("id"))
 				old_data = dwg.data_store
@@ -327,9 +322,9 @@ def updateDrawings(request):
 
 					data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
 					data_to_return.append(data_dict)
-		except:
-			pass
-	return JsonResponse({"updatedData":data_to_return})
+		return JsonResponse({"updatedData":data_to_return})
+	except:
+		pass
 
 
 @csrf_exempt
@@ -358,41 +353,6 @@ def uploadDrawings(request):
 
 
 		return JsonResponse({'Upload status':success})
-
-
-	# 	for drawing in jd:
-
-	# 		dnum = drawing['dn_project'] + "-" + drawing['dn_originator'] + "-" + drawing['dn_volume_system'] + "-" + drawing['dn_type'] + "-" + drawing['dn_discipline'] + drawing['dn_series'] + drawing['dn_level'] + drawing['dn_zone_sequence']
-	# 		dnum = str(dnum).replace("~","")	
-
-	# 		log.append(dnum)
-			
-
-	# 		try:
-	# 			exist = get_object_or_404(Drawings, dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence']) 
-	# 			# exist = get_object_or_404(Drawings, pk=1)
-	# 			log.append("hello" + str(exist))
-	# 			log.append("Object exists")
-	# 		except:
-	# 			log.append("Object doesn't exist")
-
-	# 		try:
-	# 			mod, created = Drawings.objects.update_or_create(dn_project=drawing['dn_project'], dn_originator=drawing['dn_originator'], dn_volume_system= drawing['dn_volume_system'], dn_type=drawing['dn_type'], dn_discipline=drawing['dn_discipline'], dn_series=drawing['dn_series'], dn_level=drawing['dn_level'], dn_zone_sequence=drawing['dn_zone_sequence'], defaults=drawing)
-	# 			# values = str(Drawings.objects.values())
-
-	# 			if created:
-	# 				createdcount = createdcount+ 1
-	# 			else:
-	# 				updatecount = updatecount + 1
-	# 		except:
-	# 			log.append("update_or_create failed")
-
-
-	# 		return JsonResponse({'Created count':createdcount,'Updated count':updatecount})
-	# 		# return JsonResponse({'Log':log,'Created count':createdcount,'Objects':values})
-	
-	# else:
-	# 	return JsonResponse({'Error':'ONLY POST REQUESTS'})
 
 @csrf_exempt
 def uploadSubmissions(request):
@@ -464,12 +424,12 @@ def uploadSubmissions(request):
 	else:
 		return JsonResponse({'Error':'ONLY POST REQUESTS'})
 
-def drawingTable(request):
+def drawingTable(request, pj_slug):
 	import json
 
 	tableHeads = {}
 
-	allDwg = Drawings.objects.all()[:100]
+	allDwg = Drawings.objects.filter(project__number = pj_slug)[:100]
 	for d in allDwg:
 		ddict = d.data_store
 		for k in ddict:

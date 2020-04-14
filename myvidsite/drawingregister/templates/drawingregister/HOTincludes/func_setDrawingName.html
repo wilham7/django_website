@@ -11,11 +11,7 @@
 			var editheaders = table.getSettings().colHeaders;
 			var elid_col = editheaders.indexOf(unique_identifier_colHeader)
 			var col_vals = table.getDataAtCol(elid_col)
-			
 			var row = col_vals.indexOf(row_id)
-			console.log(col_vals)
-			console.log("row_id")
-			console.log(row_id)
 
 			var val = rowData[d]['drawing_name']
 			table.setDataAtCell(row, 1, val, 'loadData')
