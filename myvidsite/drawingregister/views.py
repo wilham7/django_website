@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.core import serializers
 from django.urls import reverse
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from .serializers import *
 from .forms import *
@@ -430,22 +431,20 @@ def drawingTable(request, pj_slug, page_slug):
 
 	pj = Projects.objects.get(number=pj_slug)
 	colouredCols = pj.namingConv
-	print(colouredCols)
 
-	blockSize = 100
 	allDwg = Drawings.objects.filter(project__number = pj_slug)
-	count = allDwg.count()
-	chunks = [allDwg[x:x+blockSize] for x in range(0, count, blockSize)]
-	nav_tab_count = []
-	cx = 1
-	for c in chunks:
-		nav_tab_count.append(cx)
-		cx = cx+1
+	
+	pageSize = 50
+	p = Paginator(allDwg, pageSize)
+	nav_tab_count = list(p.page_range)
+	try:
+		page_obj = p.page(page_slug)
+	except PageNotAnInteger:
+		page_obj = p.page(1)
+	except EmptyPage:
+		page_obj = p.page(p.num_pages)	
 
-	realPage = int(page_slug)-1
-	pagedDwg = chunks[realPage]
-
-	for d in pagedDwg:
+	for d in page_obj:
 		ddict = d.data_store
 		for k in ddict:
 			if k in tableHeads:
@@ -482,13 +481,14 @@ def drawingTable(request, pj_slug, page_slug):
 	final_params.update(end_params)
 
 
-	allDrawings = DrawingSerializer(pagedDwg, many=True).data
+	allDrawings = DrawingSerializer(page_obj, many=True).data
 	context = {
 	"params":final_params,
 	"base_params":baseTableHeads,
 	"params_filter":params_filter,
 	"data":json.dumps(allDrawings),
-	"nav_current_tab":int(page_slug),
+	"page_obj":page_obj,
+	"nav_current_tab":page_slug,
 	"nav_tab_count":nav_tab_count,
 	"pj_slug":pj_slug,
 	"colouredCols":colouredCols,

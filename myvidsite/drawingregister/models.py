@@ -268,6 +268,7 @@ class Drawings(models.Model):
 
 	class Meta:
 		verbose_name_plural = "Drawings"
+		ordering = ['drawing_name']
 	def __str__(self):
 		if self.drawing_name != "":
 			return self.drawing_name
@@ -362,3 +363,4 @@ class Submissions(models.Model):
 	class Meta:
 		verbose_name_plural = "Submissions"
 		unique_together = ('sub_date', 'project')
+

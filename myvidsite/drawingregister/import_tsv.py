@@ -79,7 +79,7 @@ def makeDrawings():
 def makeDrawings2():
 	headers = []
 
-	with open("Drawing register.tsv") as tsvfile:
+	with open("Drawing register PN.tsv") as tsvfile:
 		read = csv.reader(tsvfile, delimiter='\t')
 		for row in read:
 			headers.append(row)
@@ -162,7 +162,7 @@ def makeSubs():
 
 	headers = []
 
-	with open("Drawing register.tsv") as tsvfile:
+	with open("Drawing register PN.tsv") as tsvfile:
 		read = csv.reader(tsvfile, delimiter='\t')
 		for row in read:
 			headers.append(row)

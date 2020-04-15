@@ -9,17 +9,14 @@
           width: 100%;
       }
 
-     .footer {
-        position: fixed;
-        width: 100%;
-      }
-
-      .container{
-        width: 100vh !important;
-      }
-
       .handsontable td.namingCell{
         background-color: #dcedc8;
+      }
+      .handsontable td.blankCell{
+        background-color: #ffebee;
+      }
+      .handsontable td.nullCell{
+        background-color: #fafafa ;
       }
 
   </style>
@@ -62,7 +59,7 @@
 
 <body>
   
-  <div style="padding-top: 10px;">
+  <div>
     <div id="example"></div>
   </div>
 
@@ -104,6 +101,8 @@
     function myIDRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.innerHTML = value;
         td.id = data[cellProperties["row"]]["id"];
+        if (value == "") { td.className = 'blankCell' }
+        if (value == "-") { td.className = 'nullCell' }
         return td
     }
 
@@ -111,6 +110,8 @@
         td.innerHTML = value;
         td.id = data[cellProperties["row"]]["id"];
         td.className = "namingCell"
+        if (value == "") { td.className = 'blankCell' }
+        if (value == "-") { td.className = 'nullCell' }
         return td
     }
 
@@ -235,17 +236,38 @@
     table.render();
 
   </script>
-
   <div class="footer">
-    <ul class="pagination">
-      {% for nav in nav_tab_count %}
-        {% if nav == nav_current_tab  %}
-          <li class="active"><a href="#">{{ nav }}</a></li>
+    {% if page_obj.paginator.num_pages > 1 %}
+      <ul class="pagination">
+        {% if page_obj.paginator.num_pages != 1 %}
+          <li class="waves-effect"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=1 %}">First</a></li>
         {% else %}
-          <li class="waves-effect" style="color: red"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=nav %}">{{ nav }}</a></li>
+          <li class="disabled"><a href="#">First</a></li>
         {% endif %}
-      {% endfor %}
-    </ul>
+        {% if page_obj.has_previous %}
+          <li class="waves-effect"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=page_obj.previous_page_number %}"><i class="material-icons">chevron_left</i></a></li>
+        {% else %}
+          <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% for i in page_obj.paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="active"><a href="#">{{ i }} <span class="sr-only">(current)</span></a></li>
+          {% elif page_obj.number > i|add:"-5" and page_obj.number < i|add:"+5"%}
+            <li class="waves-effect"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=i %}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li class="waves-effect"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=page_obj.next_page_number %}"><i class="material-icons">chevron_right</i></a></li>
+        {% else %}
+          <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+        {% if page_obj.paginator.num_pages != page_obj.number %}
+          <li class="waves-effect"><a href="{% url 'drawingregister:drawingTable' pj_slug=pj_slug page_slug=page_obj.paginator.num_pages %}">Last</a></li>
+        {% else %}
+          <li class="disabled"><a href="#">Last</a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
   </div>
 
 </body>
