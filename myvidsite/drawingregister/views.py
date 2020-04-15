@@ -492,6 +492,7 @@ def drawingTable(request, pj_slug, page_slug):
 	"nav_tab_count":nav_tab_count,
 	"pj_slug":pj_slug,
 	"colouredCols":colouredCols,
+	"dupCheck":allDwg,
 	}
 
 	return render(request,"drawingregister/drawing_table.html",context)
