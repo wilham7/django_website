@@ -125,17 +125,74 @@
 
 			}
 
-			// THIS IS WHERE WE NEED TO CREATE THE PROJECT NAME USING colouredCols AND THEN CHECK AGAINST dupCheck
+			// THIS IS WHERE WE NEED TO CREATE THE PROJECT NAME USING colCols AND THEN CHECK AGAINST dupCheck
 			//IF IT FAILS THEN RECOLOUR CELL
+			console.log("Wills Test")
+			var editheaders = table.getSettings().colHeaders;
+			var colindex = editheaders.indexOf("Id")
+			var coldata = this.getDataAtCol(colindex)
+
 			for ( var i = 0; i < payload["data"].length; i ++ ) {
-				
-				console.log("Wills Test")
-				console.log(payload["data"][i])
+				var payloadi = Number(payload["data"][i]["id"])
+				var rowindex = coldata.indexOf(payloadi)
 
+				var rowdata = this.getSourceDataAtRow(rowindex)["data_store"]
+				var newname = []
 
+				for ( var k = 0; k < colCols.length; k ++ ) {
+					if (colCols[k] in rowdata == true) {
+						newname.push(rowdata[colCols[k]])
+					}
+					else {
+						newname.push(colCols[k])
+					}
+				}
+
+				//USING THE LUTs TO CORRECT THE NAME
+				for ( var l = 0; l < namingLUTs.length; l ++ ){
+					keys = Object.keys(namingLUTs[l])
+					for ( var j = 0; j < keys.length; j ++ ){
+						var idx = newname.indexOf(keys[j])
+						if (idx != 1 ) {
+							newname[idx] = namingLUTs[l][keys[j]]
+						}
+					}
+				}
+				newname = newname.join("")
+				newname = newname.replace("~","")
+				console.log(newname)
+
+				var dwgcol = editheaders.indexOf("Drawing name")
+				var dwgname = this.getDataAtCell(rowindex, dwgcol)
+
+				console.log(dwgname)
+
+				if (newname == dwgname) {
+					console.log("No change made")
+				}
+				else{
+					console.log("A change was made")
+					if (dupCheck.indexOf(newname) != -1){
+						console.log("WE HAVE A PROBLEM!")
+						var spliceidx = payloadi
+						console.log(spliceidx)
+						for (var m = 0; m < payload["data"].length; m ++ ){
+							if (Number(payload["data"][m]["id"]) == spliceidx) {
+								//THE SPLICING IS NOT CURRENTLY WORKING!!! PLEASE SOLVE!!
+								console.log(payload)
+								payload["data"].splice(m, 1)
+								console.log(payload)
+							}
+						}
+					}
+					else{
+						dupCheck.splice(dupCheck.indexOf(dwgname), 1)
+						dupCheck.push(newname)
+
+					}
+
+				}
 			}
-			// colouredCols
-			// dupCheck
 
 
 			if (continue_run == true) {

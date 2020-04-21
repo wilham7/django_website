@@ -482,6 +482,17 @@ def drawingTable(request, pj_slug, page_slug):
 
 
 	allDrawings = DrawingSerializer(page_obj, many=True).data
+	dupCheck = []
+	for d in allDwg:
+		dupCheck.append(d.drawing_name)
+
+	lutnames = ast.literal_eval(pj.namingLUTs)
+	print(lutnames)
+	luts = []
+	for l in lutnames:
+		luts.append(eval(l))
+	print(luts)
+
 	context = {
 	"params":final_params,
 	"base_params":baseTableHeads,
@@ -492,7 +503,8 @@ def drawingTable(request, pj_slug, page_slug):
 	"nav_tab_count":nav_tab_count,
 	"pj_slug":pj_slug,
 	"colouredCols":colouredCols,
-	"dupCheck":allDwg,
+	"dupCheck":dupCheck,
+	"namingLUTs":luts,
 	}
 
 	return render(request,"drawingregister/drawing_table.html",context)

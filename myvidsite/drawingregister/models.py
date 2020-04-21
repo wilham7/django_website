@@ -84,7 +84,7 @@ sequence_LUT = {"00":"00 - Whole Site","00.":"00 - Whole Site","01":"01 - Buildi
 
 ##LOOK UP TABLES
 ##________________________________________________
-discipline_to_xx = {"Architectural":"AR"}
+discipline_to_xx = {"Architectural":"AR","Structural":"ST"}
 originator_to_cox = {"COX Architects":"COX"}
 ##________________________________________________
 
