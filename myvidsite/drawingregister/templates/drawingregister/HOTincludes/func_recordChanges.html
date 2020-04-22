@@ -16,8 +16,8 @@
 
 				var dataHead = modifications[i][1]
 
-				console.log(data_lut)
-				console.log(dataHead)
+				// console.log(data_lut)
+				// console.log(dataHead)
 
 				var dataValue = modifications[i][3]
 
@@ -27,7 +27,7 @@
 
 				var actualhead = data_lut[dataHead]
 
-				console.log(actualhead)
+				// console.log(actualhead)
 
 				// If its an editable column and room type column exists
 				if (do_not_edit.indexOf(actualhead) == -1) {
@@ -60,7 +60,7 @@
 								// 	console.log(e)
 								// }
 								
-								console.log(footer)
+								// console.log(footer)
 
 								apob[header] = {}
 								apob[header][footer] = ""
@@ -127,16 +127,19 @@
 
 			// THIS IS WHERE WE NEED TO CREATE THE PROJECT NAME USING colCols AND THEN CHECK AGAINST dupCheck
 			//IF IT FAILS THEN RECOLOUR CELL
-			console.log("Wills Test")
+			console.log("Checking if the change is allowed......")
 			var editheaders = table.getSettings().colHeaders;
 			var colindex = editheaders.indexOf("Id")
 			var coldata = this.getDataAtCol(colindex)
 
 			for ( var i = 0; i < payload["data"].length; i ++ ) {
 				var payloadi = Number(payload["data"][i]["id"])
-				var rowindex = coldata.indexOf(payloadi)
 
-				var rowdata = this.getSourceDataAtRow(rowindex)["data_store"]
+
+				var realindex = coldata.indexOf(payloadi)
+				rowindex = table.toPhysicalRow(realindex)
+
+				var rowdata = table.getSourceData()[rowindex]["data_store"]
 				var newname = []
 
 				for ( var k = 0; k < colCols.length; k ++ ) {
@@ -160,39 +163,39 @@
 				}
 				newname = newname.join("")
 				newname = newname.replace("~","")
-				console.log(newname)
 
 				var dwgcol = editheaders.indexOf("Drawing name")
-				var dwgname = this.getDataAtCell(rowindex, dwgcol)
+				var dwgname = this.getDataAtCell(realindex, dwgcol)
 
-				console.log(dwgname)
+				var rowIDs = []
 
 				if (newname == dwgname) {
-					console.log("No change made")
+
+					if (table.getCellMeta(rowindex,0)["renderer"]["name"] == "dupRenderer"){
+						undupCell(editheaders, coldata, rowindex)
+						console.log("Reverting to an old drawing")
+					}
+					else{
+						console.log("No change made")
+					}
 				}
 				else{
 					console.log("A change was made")
 					if (dupCheck.indexOf(newname) != -1){
 						console.log("WE HAVE A PROBLEM!")
 						var spliceidx = payloadi
-						console.log(spliceidx)
-						for (var m = 0; m < payload["data"].length; m ++ ){
-							if (Number(payload["data"][m]["id"]) == spliceidx) {
-								//THE SPLICING IS NOT CURRENTLY WORKING!!! PLEASE SOLVE!!
-								console.log(payload)
-								payload["data"].splice(m, 1)
-								console.log(payload)
-							}
+						rowIDs.push(payloadi)
+						if (Number(payload["data"][i]["id"]) == spliceidx) {
+							payload["data"].splice(i, 1)
 						}
 					}
 					else{
 						dupCheck.splice(dupCheck.indexOf(dwgname), 1)
 						dupCheck.push(newname)
-
 					}
-
 				}
 			}
+				dupCell(editheaders, coldata, rowIDs)
 
 
 			if (continue_run == true) {

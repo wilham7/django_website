@@ -88,8 +88,7 @@ def makeDrawings2():
 		vals = headers
 		del vals[0]
 
-		print(keys)
-		print('-----------------------')
+		print('UPLOADING DRAWINGS...........')
 
 		all_data = []	
 
@@ -256,7 +255,7 @@ def makeSubs():
 
 
 
-# makeDrawings2()
+makeDrawings2()
 
 # makeDrawings()
-makeSubs()
+# makeSubs()

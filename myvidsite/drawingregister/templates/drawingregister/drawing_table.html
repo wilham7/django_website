@@ -12,6 +12,9 @@
       .handsontable td.namingCell{
         background-color: #dcedc8;
       }
+      .handsontable td.dupCell{
+        background-color: #FF0000;
+      }
       .handsontable td.blankCell{
         background-color: #ffebee;
       }
@@ -116,6 +119,13 @@
         td.className = "namingCell"
         if (value == "") { td.className = 'blankCell' }
         if (value == "-") { td.className = 'nullCell' }
+        return td
+    }
+
+    function dupRenderer(instance, td, row, col, prop, value, cellProperties) {
+        td.innerHTML = value;
+        td.id = data[cellProperties["row"]]["id"];
+        td.className = "dupCell"
         return td
     }
 

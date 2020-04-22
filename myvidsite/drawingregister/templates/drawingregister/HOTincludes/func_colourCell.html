@@ -9,17 +9,40 @@
 				renderer_lut["data_store."+naming_headers[i]] = {}
 				renderer_lut["data_store."+naming_headers[i]] = {"renderer":namingRenderer}
 				console.log("MATHCING HEADER")
+				console.log(renderer_lut)
 			}
 			else {
-				console.log("NO MATCH")
+				// console.log("NO MATCH")
 			}
 		}
 
 		return renderer_lut
-
-
 	}
 
+	function dupCell(editheaders, allIDs, rowIDs){
+		for (var i = 0; i < rowIDs.length; i ++ ) {
+			var rowindex = allIDs.indexOf(rowIDs[i])
+			for (var j = 0; j < editheaders.length; j ++ ) {
+				table.setCellMeta(rowindex, j, 'renderer', dupRenderer);
+				table.render();
+			}
+		}
+	}	
+	function undupCell(editheaders, coldata, rowindex){
+		console.log("UPDUPCELL")
+		for (var j = 0; j < editheaders.length; j ++ ) {
+			console.log(data_lut)
+			console.log(colCols)
+			if (Object.keys(data_lut).indexOf("data_store."+colCols[j]) != -1) {
+				table.setCellMeta(rowindex, j, 'renderer', namingRenderer);	
+			}
+			else{
+				table.setCellMeta(rowindex, j, 'renderer', myIDRenderer);
+			}
+		}
+		table.render();
+	}
 
+	
 
 </script>

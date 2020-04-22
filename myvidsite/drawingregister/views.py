@@ -9,6 +9,7 @@ from .models import *
 from .serializers import *
 from .forms import *
 
+from collections import Counter
 import datetime
 import math
 import ast
@@ -36,12 +37,26 @@ class SubmissionViewSet(viewsets.ModelViewSet):
 
 
 def newView(request):
-	objs = Drawings.objects.all()
-	for d in objs:
-		d.originator = 'Cox Architects'
-		d.save()
-		d.drawingName()
-	return JsonResponse({"Status":"Drawing names updated"})
+
+	## DRAWING NAME SETTER
+	# objs = Drawings.objects.all()
+	# for d in objs:
+	# 	d.originator = 'Cox Architects'
+	# 	d.save()
+	# 	d.drawingName()
+
+	# DUPLICATE CHECKER
+	d = Drawings.objects.values('drawing_name')
+	l = []
+	dups = []
+	for i in d:
+		if i in l:
+			dups.append(i)
+		else:
+			l.append(i)
+
+
+	return HttpResponse(dups)
 
 def dictTest(request):
 	dwg = Drawings.objects.get(drawing_name="SFS-COX-01-DR-AR24L402")
@@ -348,13 +363,15 @@ def uploadDrawings(request):
 			# print(d)
 			try:
 				Drawings.objects.create(data_store=data,project=pj)
+				# d = Drawings.objects.get(data_store=data,project=pj)
+				# d.drawingName()
 				updatecount += 1
 				print("Create count:" + str(updatecount))
 			except Exception as e:
-				print(e)			
+				print("Print failed... probably because it was a duplicate")			
 
 
-		return JsonResponse({'Upload status':success})
+		return JsonResponse({'Upload status':"success"})
 
 @csrf_exempt
 def uploadSubmissions(request):
@@ -487,11 +504,9 @@ def drawingTable(request, pj_slug, page_slug):
 		dupCheck.append(d.drawing_name)
 
 	lutnames = ast.literal_eval(pj.namingLUTs)
-	print(lutnames)
 	luts = []
 	for l in lutnames:
 		luts.append(eval(l))
-	print(luts)
 
 	context = {
 	"params":final_params,

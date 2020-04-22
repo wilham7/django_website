@@ -173,7 +173,7 @@ class Drawings(models.Model):
 
 	project = models.ForeignKey(Projects, on_delete=models.CASCADE,blank=True,null=True)
 	data_store = DataField()
-	drawing_name = models.CharField(max_length=200,default="", blank=True)
+	drawing_name = models.CharField(max_length=200,default="", blank=True, unique=True)
 
 
 	def drawingName(self):
@@ -269,7 +269,6 @@ class Drawings(models.Model):
 	class Meta:
 		verbose_name_plural = "Drawings"
 		ordering = ['drawing_name']
-		unique_together = ('drawing_name', 'project')
 	def __str__(self):
 		if self.drawing_name != "":
 			return self.drawing_name
