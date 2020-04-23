@@ -203,9 +203,28 @@
 
       manualColumnMove: true,
       manualColumnResize: true,
+      allowInsertRow: true,
 
 
       // contextMenu: ['filter_by_condition', 'filter_operators', 'filter_by_condition2', 'filter_by_value', 'filter_action_bar'],
+
+
+      contextMenu: {
+        items: {
+          'row_above': {
+            name: 'Insert row above'
+          },
+          'row_below': {},
+          'separator': Handsontable.plugins.ContextMenu.SEPARATOR,
+          // 'clear_custom': {
+          //   name: 'Clear all cells (custom)',
+          //   callback: function() {
+          //     this.clear();
+          //   }
+          // }
+        }
+      },
+
       // dropdownMenu: true,
       // filters: true,
       search: true,

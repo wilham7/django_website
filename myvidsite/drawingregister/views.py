@@ -316,32 +316,43 @@ def updateDrawings(request):
 			data = request.POST['data']
 			data = ast.literal_eval(data)
 			data = data.get("data")
+			print(data)
+			print("data")
+
+
 
 			for obj in data:
-				dwg = Drawings.objects.get(pk=obj.get("id"))
-				old_data = dwg.data_store
-				new_data = obj.get("data_store")
-				combined_data = {}
-				combined_data.update(old_data)
-				try:
-					combined_data.update(new_data)
-				except Exception as e:
-					print(e)
-				if combined_data == old_data:
-					pass
-					print("No changes to update")
-				else:
-					dwg.data_store = combined_data
-					dwg.drawingName()
-					dwg.save()
-					print("A Drawing was updated!")
-					print(dwg.drawing_name)
+				if obj["id"] == 'null':
+					print("It broke")
+					dwg = Drawings.objects.create(id="",data_store=obj['data_store'])
 
-					data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
-					data_to_return.append(data_dict)
+
+				else:
+					dwg = Drawings.objects.get(pk=obj.get("id"))
+					old_data = dwg.data_store
+					new_data = obj.get("data_store")
+					combined_data = {}
+					combined_data.update(old_data)
+					try:
+						combined_data.update(new_data)
+					except Exception as e:
+						print(e)
+					if combined_data == old_data:
+						pass
+						print("No changes to update")
+					else:
+						dwg.data_store = combined_data
+						dwg.drawingName()
+						dwg.save()
+						print("A Drawing was updated!")
+						print(dwg.drawing_name)
+
+						data_dict  = {"id":dwg.id,"drawing_name":dwg.drawing_name}
+						data_to_return.append(data_dict)
 		return JsonResponse({"updatedData":data_to_return})
-	except:
-		pass
+	except Exception as e:
+		print(e)
+		return HttpResponse(e)
 
 
 @csrf_exempt
@@ -451,7 +462,7 @@ def drawingTable(request, pj_slug, page_slug):
 
 	allDwg = Drawings.objects.filter(project__number = pj_slug)
 	
-	pageSize = 50
+	pageSize = 100
 	p = Paginator(allDwg, pageSize)
 	nav_tab_count = list(p.page_range)
 	try:

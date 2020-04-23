@@ -132,70 +132,82 @@
 			var colindex = editheaders.indexOf("Id")
 			var coldata = this.getDataAtCol(colindex)
 
+
+
+
 			for ( var i = 0; i < payload["data"].length; i ++ ) {
 				var payloadi = Number(payload["data"][i]["id"])
 
 
 				var realindex = coldata.indexOf(payloadi)
 				rowindex = table.toPhysicalRow(realindex)
+				console.log(rowindex)
+				console.log(realindex)
 
-				var rowdata = table.getSourceData()[rowindex]["data_store"]
-				var newname = []
-
-				for ( var k = 0; k < colCols.length; k ++ ) {
-					if (colCols[k] in rowdata == true) {
-						newname.push(rowdata[colCols[k]])
-					}
-					else {
-						newname.push(colCols[k])
-					}
+				if (rowindex == -1){					
+					//pass
 				}
 
-				//USING THE LUTs TO CORRECT THE NAME
-				for ( var l = 0; l < namingLUTs.length; l ++ ){
-					keys = Object.keys(namingLUTs[l])
-					for ( var j = 0; j < keys.length; j ++ ){
-						var idx = newname.indexOf(keys[j])
-						if (idx != 1 ) {
-							newname[idx] = namingLUTs[l][keys[j]]
+				else {
+					var rowdata = table.getSourceData()[rowindex]["data_store"]
+					var newname = []
+
+					for ( var k = 0; k < colCols.length; k ++ ) {
+						if (colCols[k] in rowdata == true) {
+							newname.push(rowdata[colCols[k]])
+						}
+						else {
+							newname.push(colCols[k])
 						}
 					}
-				}
-				newname = newname.join("")
-				newname = newname.replace("~","")
 
-				var dwgcol = editheaders.indexOf("Drawing name")
-				var dwgname = this.getDataAtCell(realindex, dwgcol)
-
-				var rowIDs = []
-
-				if (newname == dwgname) {
-
-					if (table.getCellMeta(rowindex,0)["renderer"]["name"] == "dupRenderer"){
-						undupCell(editheaders, coldata, rowindex)
-						console.log("Reverting to an old drawing")
+					//USING THE LUTs TO CORRECT THE NAME
+					for ( var l = 0; l < namingLUTs.length; l ++ ){
+						keys = Object.keys(namingLUTs[l])
+						for ( var j = 0; j < keys.length; j ++ ){
+							var idx = newname.indexOf(keys[j])
+							if (idx != 1 ) {
+								newname[idx] = namingLUTs[l][keys[j]]
+							}
+						}
 					}
-					else{
-						console.log("No change made")
-					}
-				}
-				else{
-					console.log("A change was made")
-					if (dupCheck.indexOf(newname) != -1){
-						console.log("WE HAVE A PROBLEM!")
-						var spliceidx = payloadi
-						rowIDs.push(payloadi)
-						if (Number(payload["data"][i]["id"]) == spliceidx) {
-							payload["data"].splice(i, 1)
+					newname = newname.join("")
+					newname = newname.replace("~","")
+
+					var dwgcol = editheaders.indexOf("Drawing name")
+					var dwgname = this.getDataAtCell(realindex, dwgcol)
+
+					var rowIDs = []
+
+					if (newname == dwgname) {
+						try {
+							if (table.getCellMeta(rowindex,0)["renderer"]["name"] == "dupRenderer"){
+								undupCell(editheaders, coldata, rowindex)
+								console.log("Reverting to an old drawing")
+							}
+						}
+						catch{
+							console.log("No change made")
 						}
 					}
 					else{
-						dupCheck.splice(dupCheck.indexOf(dwgname), 1)
-						dupCheck.push(newname)
+						console.log("A change was made")
+						if (dupCheck.indexOf(newname) != -1){
+							console.log("WE HAVE A PROBLEM!")
+							var spliceidx = payloadi
+							rowIDs.push(payloadi)
+							if (Number(payload["data"][i]["id"]) == spliceidx) {
+								payload["data"].splice(i, 1)
+							}
+						}
+						else{
+							dupCheck.splice(dupCheck.indexOf(dwgname), 1)
+							dupCheck.push(newname)
+						}
 					}
+					dupCell(editheaders, coldata, rowIDs)
 				}
 			}
-				dupCell(editheaders, coldata, rowIDs)
 
 
 			if (continue_run == true) {

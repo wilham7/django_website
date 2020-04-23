@@ -8,8 +8,8 @@
 			if (Object.keys(data_lut).indexOf("data_store."+naming_headers[i]) != -1) {
 				renderer_lut["data_store."+naming_headers[i]] = {}
 				renderer_lut["data_store."+naming_headers[i]] = {"renderer":namingRenderer}
-				console.log("MATHCING HEADER")
-				console.log(renderer_lut)
+				// console.log("MATHCING HEADER")
+				// console.log(renderer_lut)
 			}
 			else {
 				// console.log("NO MATCH")
@@ -24,23 +24,35 @@
 			var rowindex = allIDs.indexOf(rowIDs[i])
 			for (var j = 0; j < editheaders.length; j ++ ) {
 				table.setCellMeta(rowindex, j, 'renderer', dupRenderer);
-				table.render();
+
+							// WE CANT RENDER THE ENTIRE TABLE EVERY TIME
+
+				// table.render();
 			}
 		}
 	}	
 	function undupCell(editheaders, coldata, rowindex){
-		console.log("UPDUPCELL")
+		var origheaders = []
+		var ds_headers = []
+		var rev_LUT = createRevDict(data_lut)
+
+		for (var i = 0; i < editheaders.length; i ++ ) {
+			origheaders.push(rev_LUT[editheaders[i]])
+		}
+		for (var i = 0; i < colCols.length; i ++ ) {
+			ds_headers.push("data_store."+colCols[i])
+		}
+		
+		console.log(origheaders)
 		for (var j = 0; j < editheaders.length; j ++ ) {
-			console.log(data_lut)
-			console.log(colCols)
-			if (Object.keys(data_lut).indexOf("data_store."+colCols[j]) != -1) {
+			if (ds_headers.indexOf(origheaders[j]) != -1) {
 				table.setCellMeta(rowindex, j, 'renderer', namingRenderer);	
 			}
 			else{
 				table.setCellMeta(rowindex, j, 'renderer', myIDRenderer);
 			}
 		}
-		table.render();
+		// table.render();
 	}
 
 	
